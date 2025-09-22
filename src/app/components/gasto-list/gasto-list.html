@@ -1,0 +1,31 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Gastos Recientes</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <table mat-table [dataSource]="gastos" class="mat-elevation-z8">
+      <ng-container matColumnDef="concepto">
+        <th mat-header-cell *matHeaderCellDef> Concepto </th>
+        <td mat-cell *matCellDef="let element"> {{element.concepto}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="proyecto">
+        <th mat-header-cell *matHeaderCellDef> Proyecto </th>
+        <td mat-cell *matCellDef="let element"> {{element.proyecto}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto">
+        <th mat-header-cell *matHeaderCellDef> Monto </th>
+        <td mat-cell *matCellDef="let element"> {{element.monto | currency:'S/ '}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaRegistro">
+        <th mat-header-cell *matHeaderCellDef> Fecha Registro </th>
+        <td mat-cell *matCellDef="let element"> {{element.fechaRegistro | date:'short'}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

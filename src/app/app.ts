@@ -1,12 +1,24 @@
-import { Component, signal } from '@angular/core';
+// src/app/app.component.ts
+import { Component, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { GastoFormComponent } from './components/gasto-form/gasto-form';
+import { GastoListComponent } from './components/gasto-list/gasto-list';
+
+// Importaciones de Angular Material
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [CommonModule, GastoFormComponent, GastoListComponent, MatToolbarModule],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
-export class App {
-  protected readonly title = signal('frontend');
+export class AppComponent {
+  @ViewChild(GastoListComponent) gastoList!: GastoListComponent;
+
+  actualizarLista(): void {
+    this.gastoList.cargarGastos();
+  }
 }
