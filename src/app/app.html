@@ -4,5 +4,6 @@
 
 <main class="content">
   <app-gasto-form (gastoCreado)="actualizarLista()"></app-gasto-form>
+  <app-excel-importer (importComplete)="actualizarLista()"></app-excel-importer>
   <app-gasto-list></app-gasto-list>
 </main>

@@ -1,4 +1,3 @@
-// src/app/services/api.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -45,5 +44,10 @@ export class ApiService {
   // Crea un nuevo gasto
   crearGasto(gasto: Partial<Gasto>): Observable<Gasto> {
     return this.http.post<Gasto>(this.apiUrl, gasto);
+  }
+
+  // Importa gastos en lote
+  importarGastos(gastos: Partial<Gasto>[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/import`, gastos);
   }
 }

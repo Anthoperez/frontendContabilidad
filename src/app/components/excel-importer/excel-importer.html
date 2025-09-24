@@ -1,0 +1,25 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Importar Gastos desde Excel</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div *ngIf="!processing">
+      <input type="file" (change)="onFileChange($event)" #fileInput hidden accept=".xlsx, .xls, .csv">
+      <button mat-stroked-button color="primary" (click)="fileInput.click()">
+        Seleccionar Archivo
+      </button>
+
+      <div *ngIf="fileName" class="file-info">
+        Archivo: <strong>{{ fileName }}</strong> ({{ recordCount }} filas de gastos encontradas)
+      </div>
+    </div>
+
+    <mat-progress-bar *ngIf="processing" mode="indeterminate"></mat-progress-bar>
+  </mat-card-content>
+
+  <mat-card-actions *ngIf="recordCount > 0 && !processing">
+    <button mat-raised-button color="accent" (click)="uploadData()">
+      Procesar y Guardar en Base de Datos
+    </button>
+  </mat-card-actions>
+</mat-card>
