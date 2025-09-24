@@ -1,6 +1,6 @@
 // src/app/components/gasto-form/gasto-form.component.ts
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; // Importa FormGroup
 import { CommonModule } from '@angular/common';
 import { ApiService, Gasto } from '../../services/api';
 
@@ -25,11 +25,16 @@ import { MatNativeDateModule } from '@angular/material/core';
 export class GastoFormComponent {
   @Output() gastoCreado = new EventEmitter<void>();
   tiposDocumento = ['C/S', 'P/S', 'O/S', 'R.DGA', 'O/C'];
+  fuentesFinanciamiento = ['D Y T', 'R.DET', 'R.D', '9'];
+  meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
 
-  gastoForm: ReturnType<FormBuilder['group']>;
+  // 1. Declaramos la propiedad del formulario aquí
+  gastoForm: FormGroup;
 
+  // 2. Inyectamos FormBuilder en el constructor y LUEGO inicializamos el formulario
   constructor(private fb: FormBuilder, private apiService: ApiService) {
     this.gastoForm = this.fb.group({
+      // --- CAMPOS OBLIGATORIOS ---
       tipoDocumento: ['', Validators.required],
       numeroDocumento: ['', Validators.required],
       aNombreDe: ['', Validators.required],
@@ -38,7 +43,18 @@ export class GastoFormComponent {
       especifica: ['', Validators.required],
       fechaDevengado: [null as Date | null, Validators.required],
       proyecto: ['', Validators.required],
+      mes: ['', Validators.required],
+      meta: ['', Validators.required],
+
+      // --- CAMPOS OPCIONALES (sin Validators.required) ---
       siaf: [''],
+      monto2: [null as number | null],
+      especifica2: [''],
+      ff: [''],
+      certificacionViatico: [''],
+      destino: [''],
+      fechaSalida: [null as Date | null],
+      fechaRetorno: [null as Date | null],
     });
   }
 

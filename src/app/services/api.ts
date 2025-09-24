@@ -6,16 +6,27 @@ import { Observable } from 'rxjs';
 // Definimos una 'interfaz' para que TypeScript sepa cómo es un Gasto
 export interface Gasto {
   id: number;
+  // Campos obligatorios
   tipoDocumento: string;
   numeroDocumento: string;
-  siaf?: string;
   aNombreDe: string;
   concepto: string;
   monto: number;
   especifica: string;
   fechaDevengado: string;
   proyecto: string;
+  mes: string;
+  meta: string;
   fechaRegistro: string;
+  // Campos opcionales (con '?')
+  siaf?: string;
+  monto2?: number;
+  especifica2?: string;
+  ff?: string;
+  certificacionViatico?: string;
+  destino?: string;
+  fechaSalida?: string;
+  fechaRetorno?: string;
 }
 
 @Injectable({

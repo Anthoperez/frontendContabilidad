@@ -16,7 +16,13 @@ import { MatCardModule } from '@angular/material/card';
 })
 export class GastoListComponent implements OnInit {
   gastos: Gasto[] = [];
-  displayedColumns: string[] = ['fechaRegistro', 'concepto', 'proyecto', 'monto'];
+  // ¡Ahora mostramos todas las columnas!
+  displayedColumns: string[] = [
+    'fechaRegistro', 'tipoDocumento', 'numeroDocumento', 'aNombreDe',
+    'concepto', 'monto', 'monto2', 'especifica', 'especifica2', 'ff',
+    'mes', 'fechaDevengado', 'proyecto', 'meta', 'siaf',
+    'certificacionViatico', 'destino', 'fechaSalida', 'fechaRetorno'
+  ];
 
   constructor(private apiService: ApiService) {}
 

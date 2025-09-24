@@ -1,12 +1,68 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Gastos Recientes</mat-card-title>
+    <mat-card-title>Gastos Registrados</mat-card-title>
   </mat-card-header>
-  <mat-card-content>
+  <mat-card-content class="table-container">
     <table mat-table [dataSource]="gastos" class="mat-elevation-z8">
+
+      <ng-container matColumnDef="fechaRegistro">
+        <th mat-header-cell *matHeaderCellDef> F. Registro </th>
+        <td mat-cell *matCellDef="let element"> {{element.fechaRegistro | date:'short'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipoDocumento">
+        <th mat-header-cell *matHeaderCellDef> Tipo Doc. </th>
+        <td mat-cell *matCellDef="let element"> {{element.tipoDocumento}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="numeroDocumento">
+        <th mat-header-cell *matHeaderCellDef> Nº Doc. </th>
+        <td mat-cell *matCellDef="let element"> {{element.numeroDocumento}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="aNombreDe">
+        <th mat-header-cell *matHeaderCellDef> A Nombre De </th>
+        <td mat-cell *matCellDef="let element"> {{element.aNombreDe}} </td>
+      </ng-container>
+
       <ng-container matColumnDef="concepto">
         <th mat-header-cell *matHeaderCellDef> Concepto </th>
         <td mat-cell *matCellDef="let element"> {{element.concepto}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto">
+        <th mat-header-cell *matHeaderCellDef> Monto </th>
+        <td mat-cell *matCellDef="let element" class="monto-cell"> {{element.monto | currency:'S/ '}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto2">
+        <th mat-header-cell *matHeaderCellDef> Monto 2 </th>
+        <td mat-cell *matCellDef="let element" class="monto-cell"> {{element.monto2 | currency:'S/ '}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="especifica">
+        <th mat-header-cell *matHeaderCellDef> Específica </th>
+        <td mat-cell *matCellDef="let element"> {{element.especifica}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="especifica2">
+        <th mat-header-cell *matHeaderCellDef> Específica 2 </th>
+        <td mat-cell *matCellDef="let element"> {{element.especifica2}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ff">
+        <th mat-header-cell *matHeaderCellDef> FF </th>
+        <td mat-cell *matCellDef="let element"> {{element.ff}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="mes">
+        <th mat-header-cell *matHeaderCellDef> Mes </th>
+        <td mat-cell *matCellDef="let element"> {{element.mes}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaDevengado">
+        <th mat-header-cell *matHeaderCellDef> F. Devengado </th>
+        <td mat-cell *matCellDef="let element"> {{element.fechaDevengado | date:'dd/MM/yyyy'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="proyecto">
@@ -14,17 +70,37 @@
         <td mat-cell *matCellDef="let element"> {{element.proyecto}} </td>
       </ng-container>
 
-      <ng-container matColumnDef="monto">
-        <th mat-header-cell *matHeaderCellDef> Monto </th>
-        <td mat-cell *matCellDef="let element"> {{element.monto | currency:'S/ '}} </td>
+      <ng-container matColumnDef="meta">
+        <th mat-header-cell *matHeaderCellDef> Meta </th>
+        <td mat-cell *matCellDef="let element"> {{element.meta}} </td>
       </ng-container>
 
-      <ng-container matColumnDef="fechaRegistro">
-        <th mat-header-cell *matHeaderCellDef> Fecha Registro </th>
-        <td mat-cell *matCellDef="let element"> {{element.fechaRegistro | date:'short'}} </td>
+      <ng-container matColumnDef="siaf">
+        <th mat-header-cell *matHeaderCellDef> SIAF </th>
+        <td mat-cell *matCellDef="let element"> {{element.siaf}} </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <ng-container matColumnDef="certificacionViatico">
+        <th mat-header-cell *matHeaderCellDef> Cert. Viático </th>
+        <td mat-cell *matCellDef="let element"> {{element.certificacionViatico}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="destino">
+        <th mat-header-cell *matHeaderCellDef> Destino </th>
+        <td mat-cell *matCellDef="let element"> {{element.destino}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaSalida">
+        <th mat-header-cell *matHeaderCellDef> F. Salida </th>
+        <td mat-cell *matCellDef="let element"> {{element.fechaSalida | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaRetorno">
+        <th mat-header-cell *matHeaderCellDef> F. Retorno </th>
+        <td mat-cell *matCellDef="let element"> {{element.fechaRetorno | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </mat-card-content>
