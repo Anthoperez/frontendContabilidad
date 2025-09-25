@@ -6,17 +6,25 @@
     <div *ngIf="!processing">
       <input type="file" (change)="onFileChange($event)" #fileInput hidden accept=".xlsx, .xls, .csv">
       <button mat-stroked-button color="primary" (click)="fileInput.click()">
-        Seleccionar Archivo
+        Seleccionar Archivo de Ejecución
       </button>
 
+      <mat-form-field *ngIf="sheetNames.length > 1" class="sheet-selector">
+        <mat-label>Seleccione el mes (hoja) a procesar</mat-label>
+        <mat-select [(ngModel)]="selectedSheet" (selectionChange)="processSheet()">
+          <mat-option *ngFor="let sheet of sheetNames" [value]="sheet">
+            {{ sheet }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
       <div *ngIf="fileName" class="file-info">
-        Archivo: <strong>{{ fileName }}</strong> ({{ recordCount }} filas de gastos encontradas)
+        Archivo: <strong>{{ fileName }}</strong>
+        <span *ngIf="recordCount > 0"> ({{ recordCount }} filas de gastos encontradas)</span>
       </div>
     </div>
-
     <mat-progress-bar *ngIf="processing" mode="indeterminate"></mat-progress-bar>
   </mat-card-content>
-
   <mat-card-actions *ngIf="recordCount > 0 && !processing">
     <button mat-raised-button color="accent" (click)="uploadData()">
       Procesar y Guardar en Base de Datos
