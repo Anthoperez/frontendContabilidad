@@ -57,7 +57,6 @@ export class ExcelImporterComponent {
 
   processSheet(): void {
     if (!this.workbook || !this.selectedSheet) return;
-
     const ws: XLSX.WorkSheet = this.workbook.Sheets[this.selectedSheet];
     const rawData: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
     this.processRawData(rawData);
@@ -65,23 +64,9 @@ export class ExcelImporterComponent {
 
   private processRawData(rawData: any[][]): void {
     this.processedData = [];
-    let searchFromIndex = 0;
+    let currentHeaders: string[] | null = null;
 
-    // --- LÓGICA MEJORADA PARA LEER MÚLTIPLES "CUADROS" ---
-    while (searchFromIndex < rawData.length) {
-      const headerRowIndex = rawData.findIndex((row, index) => 
-        index >= searchFromIndex && row && String(row[0]).trim() === 'DOC'
-      );
-
-      if (headerRowIndex === -1) {
-        break; // No se encontraron más encabezados, terminamos.
-      }
-
-      const headers = rawData[headerRowIndex].map(h => 
-        typeof h === 'string' ? h.trim().replace(/\s+/g, ' ') : ''
-      );
-      
-      const columnMap: { [key: string]: keyof Gasto | null } = {
+    const columnMap: { [key: string]: keyof Gasto | null } = {
         'DOC': 'tipoDocumento', 'N°': 'numeroDocumento', 'SIAF': 'siaf',
         'A NOMBRE DE': 'aNombreDe', 'CONCEPTO': 'concepto', 'MONTO': 'monto',
         'ESPECIFICA': 'especifica', 'MONTO2': 'monto2',
@@ -89,54 +74,64 @@ export class ExcelImporterComponent {
         'PROYECTO': 'proyecto', 'META': 'meta',
         'CERTIFICACION VIATICO': 'certificacionViatico', 'DESTINO': 'destino',
         'FECHA SALIDA': 'fechaSalida', 'FECHA RETORNO': 'fechaRetorno'
-      };
+    };
 
-      for (let i = headerRowIndex + 1; i < rawData.length; i++) {
-        const row = rawData[i];
+    for (const row of rawData) {
+      if (!row || row.length === 0) continue;
+      const firstCell = String(row[0]).trim();
+      if (firstCell === 'DOC') {
+        currentHeaders = row.map(h => typeof h === 'string' ? h.trim().replace(/\s+/g, ' ') : '');
+        continue;
+      }
+      if (row.some(cell => typeof cell === 'string' && cell.toUpperCase().includes('TOTAL'))) {
+        currentHeaders = null;
+        continue;
+      }
+      if (!currentHeaders || !firstCell) continue;
 
-        if ((row && String(row[0]).trim() === 'DOC') || row.some(cell => typeof cell === 'string' && cell.toUpperCase().includes('TOTAL'))) {
-          searchFromIndex = i;
-          break;
-        }
-
-        if (!row || row.length === 0 || !row[0]) {
-          continue;
-        }
-
-        const gasto: Partial<Gasto> = {};
-        let especificaCount = 0;
-        headers.forEach((header, index) => {
-          let dbField = columnMap[header];
-          if (header === 'ESPECIFICA') {
-            dbField = (especificaCount === 0) ? 'especifica' : 'especifica2';
-            especificaCount++;
-          }
-          
-          const originalValue = row[index];
-          if (dbField && originalValue !== undefined && String(originalValue).trim() !== '') {
-            let finalValue: any = String(originalValue).trim();
-
-            if (dbField === 'monto' || dbField === 'monto2') {
-              const numValue = parseFloat(finalValue.replace(/,/g, ''));
-              finalValue = isNaN(numValue) ? null : numValue;
-            } else if (dbField === 'fechaSalida' || dbField === 'fechaRetorno' || dbField === 'fechaDevengado') {
-              const dateValue = new Date(finalValue);
-              finalValue = (dateValue instanceof Date && !isNaN(dateValue.getTime())) ? dateValue.toISOString() : null;
-            }
-            
-            if (finalValue !== null) {
-               (gasto as any)[dbField] = finalValue;
-            }
-          }
-        });
-
-        if (Object.keys(gasto).length > 1) {
-            this.processedData.push(gasto);
+      const gasto: Partial<Gasto> = {};
+      let especificaCount = 0;
+      currentHeaders.forEach((header, index) => {
+        let dbField = columnMap[header];
+        if (header === 'ESPECIFICA') {
+          dbField = (especificaCount === 0) ? 'especifica' : 'especifica2';
+          especificaCount++;
         }
         
-        if (i === rawData.length - 1) {
-            searchFromIndex = rawData.length;
+        const originalValue = row[index];
+        if (dbField && originalValue !== undefined && String(originalValue).trim() !== '') {
+          let finalValue: any = originalValue;
+
+          if (dbField === 'monto' || dbField === 'monto2') {
+            const numValue = parseFloat(String(finalValue).replace(/,/g, ''));
+            finalValue = isNaN(numValue) ? null : numValue;
+          } 
+          // --- LÓGICA DE FECHA DEFINITIVA Y ROBUSTA ---
+          else if (dbField === 'fechaDevengado' || dbField === 'fechaSalida' || dbField === 'fechaRetorno') {
+            let parsedDate: Date | null = null;
+            if (originalValue instanceof Date && !isNaN(originalValue.getTime())) {
+              parsedDate = originalValue; // La librería ya nos dio una fecha válida
+            } else if (typeof originalValue === 'string' && originalValue.includes('/')) {
+              const parts = originalValue.split('/');
+              if (parts.length === 3) {
+                 // Formato DD/MM/YYYY
+                 parsedDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+              }
+            }
+            finalValue = (parsedDate && !isNaN(parsedDate.getTime())) ? parsedDate.toISOString() : null;
+          }
+          
+          if (finalValue !== null) {
+             (gasto as any)[dbField] = finalValue;
+          }
         }
+      });
+
+      // La validación final: solo importamos si el registro tiene los datos mínimos.
+      if (gasto.tipoDocumento && gasto.monto && gasto.fechaDevengado) {
+        this.processedData.push(gasto);
+      } else {
+        console.warn("Fila ignorada por falta de datos obligatorios:", row);
       }
     }
     
@@ -151,7 +146,7 @@ export class ExcelImporterComponent {
     this.processing = true;
     this.apiService.importarGastos(this.processedData).subscribe({
       next: () => {
-        this.showSuccess(`¡Éxito! Se importaron ${this.processedData.length} registros de la hoja "${this.selectedSheet}".`);
+        this.showSuccess(`¡Éxito! Se importaron ${this.processedData.length} registros.`);
         this.importComplete.emit();
         this.reset();
       },
