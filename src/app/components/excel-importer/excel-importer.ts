@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as XLSX from 'xlsx';
 import { ApiService, Gasto } from '../../services/api';
@@ -9,15 +9,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-excel-importer',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatCardModule, MatButtonModule, MatProgressBarModule, 
-    MatSnackBarModule, MatSelectModule, MatFormFieldModule
+    MatSnackBarModule
   ],
   templateUrl: './excel-importer.html',
   styleUrls: ['./excel-importer.css']
@@ -28,44 +26,108 @@ export class ExcelImporterComponent {
   processing = false;
   processedData: Partial<Gasto>[] = [];
 
-  workbook: XLSX.WorkBook | null = null;
-  sheetNames: string[] = [];
-  selectedSheet: string = '';
+  private workbook: XLSX.WorkBook | null = null;
 
-  constructor(private apiService: ApiService, private snackBar: MatSnackBar) {}
+  constructor(
+    private apiService: ApiService, 
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   onFileChange(event: any): void {
-    this.reset();
     const target: DataTransfer = <DataTransfer>(event.target);
-    if (target.files.length !== 1) return;
-
-    this.fileName = target.files[0].name;
+    if (!target.files || target.files.length !== 1) {
+      if(target) (target as any).value = null; 
+      return;
+    }
+    const file = target.files[0];
+    this.processedData = [];
+    this.workbook = null;
+    this.fileName = file.name;
+    this.processing = true;
+    this.cdr.detectChanges();
     const reader: FileReader = new FileReader();
-
     reader.onload = (e: any) => {
-      const data: ArrayBuffer = e.target.result;
-      this.workbook = XLSX.read(data, { type: 'array', cellDates: true });
-      this.sheetNames = this.workbook.SheetNames;
-
-      if (this.sheetNames.length === 1) {
-        this.selectedSheet = this.sheetNames[0];
-        this.processSheet();
+      try {
+        const data: ArrayBuffer = e.target.result;
+        this.workbook = XLSX.read(data, { type: 'array', cellDates: false });
+        this.processAllSheets();
+      } catch (error) {
+        console.error("Error al leer el archivo Excel:", error);
+        this.showError("El archivo parece estar dañado o no es un formato de Excel válido.");
+        this.resetFileState();
+      } finally {
+        this.processing = false;
+        this.cdr.detectChanges();
       }
     };
-    reader.readAsArrayBuffer(target.files[0]);
+    reader.onerror = (error) => {
+      console.error("Error en FileReader:", error);
+      this.showError("Ocurrió un error fundamental al intentar leer el archivo.");
+      this.resetFileState();
+    };
+    reader.readAsArrayBuffer(file);
   }
 
-  processSheet(): void {
-    if (!this.workbook || !this.selectedSheet) return;
-    const ws: XLSX.WorkSheet = this.workbook.Sheets[this.selectedSheet];
-    const rawData: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
-    this.processRawData(rawData);
+  private processAllSheets(): void {
+    if (!this.workbook) return;
+    let allGastos: Partial<Gasto>[] = [];
+    for (const sheetName of this.workbook.SheetNames) {
+      const ws: XLSX.WorkSheet = this.workbook.Sheets[sheetName];
+      const rawData: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
+      const gastosDeLaHoja = this.parseSheetData(rawData);
+      allGastos = allGastos.concat(gastosDeLaHoja);
+    }
+    this.processedData = allGastos;
+    if (this.processedData.length === 0) {
+      this.showError(`El archivo "${this.fileName}" no contiene filas de gastos válidas.`);
+    }
   }
 
-  private processRawData(rawData: any[][]): void {
-    this.processedData = [];
+  private parseExcelDate(value: any, fieldName: keyof Gasto): Date | null {
+    if (value === null || value === undefined || String(value).trim() === '') {
+      return null;
+    }
+
+    if (typeof value === 'number') {
+      // ✅ CORRECCIÓN: Se añade la hora 12 para evitar el desfase de zona horaria.
+      const date = new Date(Date.UTC(1900, 0, value - 1, 12));
+      return !isNaN(date.getTime()) ? date : null;
+    }
+
+    if (typeof value === 'string') {
+      const parts = value.split('/');
+      if (parts.length !== 3) return null;
+
+      let day: number, month: number, year: number;
+
+      if (fieldName === 'fechaDevengado') {
+        day = parseInt(parts[0], 10);
+        month = parseInt(parts[1], 10);
+        year = parseInt(parts[2], 10);
+      } else {
+        month = parseInt(parts[0], 10);
+        day = parseInt(parts[1], 10);
+        year = parseInt(parts[2], 10);
+      }
+      
+      if (year < 100) year += 2000;
+
+      if (isNaN(day) || isNaN(month) || isNaN(year) || month < 1 || month > 12 || day < 1 || day > 31) {
+        return null;
+      }
+      
+      // ✅ CORRECCIÓN: Se añade la hora 12 para evitar el desfase de zona horaria.
+      const date = new Date(Date.UTC(year, month - 1, day, 12));
+      return !isNaN(date.getTime()) ? date : null;
+    }
+
+    return null;
+  }
+
+  private parseSheetData(rawData: any[][]): Partial<Gasto>[] {
+    const gastos: Partial<Gasto>[] = [];
     let currentHeaders: string[] | null = null;
-
     const columnMap: { [key: string]: keyof Gasto | null } = {
         'DOC': 'tipoDocumento', 'N°': 'numeroDocumento', 'SIAF': 'siaf',
         'A NOMBRE DE': 'aNombreDe', 'CONCEPTO': 'concepto', 'MONTO': 'monto',
@@ -78,17 +140,17 @@ export class ExcelImporterComponent {
 
     for (const row of rawData) {
       if (!row || row.length === 0) continue;
-      const firstCell = String(row[0]).trim();
+      const firstCell = row[0] ? String(row[0]).trim() : '';
       if (firstCell === 'DOC') {
-        currentHeaders = row.map(h => typeof h === 'string' ? h.trim().replace(/\s+/g, ' ') : '');
+        currentHeaders = row.map(h => h ? String(h).trim().replace(/\s+/g, ' ') : '');
         continue;
       }
-      if (row.some(cell => typeof cell === 'string' && cell.toUpperCase().includes('TOTAL'))) {
+      if (row.some(cell => cell && typeof cell === 'string' && cell.toUpperCase().includes('TOTAL'))) {
         currentHeaders = null;
         continue;
       }
       if (!currentHeaders || !firstCell) continue;
-
+      
       const gasto: Partial<Gasto> = {};
       let especificaCount = 0;
       currentHeaders.forEach((header, index) => {
@@ -99,72 +161,56 @@ export class ExcelImporterComponent {
         }
         
         const originalValue = row[index];
-        if (dbField && originalValue !== undefined && String(originalValue).trim() !== '') {
+        if (dbField && originalValue !== null && originalValue !== undefined) {
           let finalValue: any = originalValue;
 
-          if (dbField === 'monto' || dbField === 'monto2') {
+          if (dbField === 'fechaDevengado' || dbField === 'fechaSalida' || dbField === 'fechaRetorno') {
+            const parsedDate = this.parseExcelDate(originalValue, dbField);
+            finalValue = parsedDate ? parsedDate.toISOString() : null;
+          } 
+          else if (dbField === 'monto' || dbField === 'monto2') {
             const numValue = parseFloat(String(finalValue).replace(/,/g, ''));
             finalValue = isNaN(numValue) ? null : numValue;
-          } 
-          // --- LÓGICA DE FECHA DEFINITIVA Y ROBUSTA ---
-          else if (dbField === 'fechaDevengado' || dbField === 'fechaSalida' || dbField === 'fechaRetorno') {
-            let parsedDate: Date | null = null;
-            if (originalValue instanceof Date && !isNaN(originalValue.getTime())) {
-              parsedDate = originalValue; // La librería ya nos dio una fecha válida
-            } else if (typeof originalValue === 'string' && originalValue.includes('/')) {
-              const parts = originalValue.split('/');
-              if (parts.length === 3) {
-                 // Formato DD/MM/YYYY
-                 parsedDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-              }
-            }
-            finalValue = (parsedDate && !isNaN(parsedDate.getTime())) ? parsedDate.toISOString() : null;
           }
           
-          if (finalValue !== null) {
-             (gasto as any)[dbField] = finalValue;
+          if (finalValue !== null && String(finalValue).trim() !== '') {
+              (gasto as any)[dbField] = finalValue;
           }
         }
       });
 
-      // La validación final: solo importamos si el registro tiene los datos mínimos.
       if (gasto.tipoDocumento && gasto.monto && gasto.fechaDevengado) {
-        this.processedData.push(gasto);
-      } else {
-        console.warn("Fila ignorada por falta de datos obligatorios:", row);
+        gastos.push(gasto);
       }
     }
-    
-    if (this.processedData.length === 0) {
-      this.showError(`La hoja "${this.selectedSheet}" no contiene filas de gastos válidas.`);
-    }
+    return gastos;
   }
   
   uploadData(): void {
     if (this.processedData.length === 0) return;
-
     this.processing = true;
     this.apiService.importarGastos(this.processedData).subscribe({
       next: () => {
         this.showSuccess(`¡Éxito! Se importaron ${this.processedData.length} registros.`);
         this.importComplete.emit();
-        this.reset();
+        this.resetFileState();
       },
       error: (err) => {
-        this.showError('Ocurrió un error al importar los datos. Revisa la terminal del backend.');
-        console.error("Error completo:", err);
+        this.showError('Ocurrió un error al importar los datos.');
+        console.error("Error al llamar a la API:", err);
         this.processing = false;
       }
     });
   }
 
-  private reset(): void {
+  private resetFileState(): void {
     this.fileName = '';
     this.processedData = [];
     this.processing = false;
     this.workbook = null;
-    this.sheetNames = [];
-    this.selectedSheet = '';
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+    this.cdr.detectChanges();
   }
 
   private showError(message: string): void {

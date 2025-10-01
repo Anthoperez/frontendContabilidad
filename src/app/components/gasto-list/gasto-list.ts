@@ -18,9 +18,9 @@ export class GastoListComponent implements OnInit {
   gastos: Gasto[] = [];
   // ¡Ahora mostramos todas las columnas!
   displayedColumns: string[] = [
-    'fechaRegistro', 'tipoDocumento', 'numeroDocumento', 'aNombreDe',
+    'fechaRegistro','tipoDocumento', 'numeroDocumento', 'siaf', 'aNombreDe',
     'concepto', 'monto', 'monto2', 'especifica', 'especifica2', 'ff',
-    'mes', 'fechaDevengado', 'proyecto', 'meta', 'siaf',
+    'mes', 'fechaDevengado', 'proyecto', 'meta',
     'certificacionViatico', 'destino', 'fechaSalida', 'fechaRetorno'
   ];
 

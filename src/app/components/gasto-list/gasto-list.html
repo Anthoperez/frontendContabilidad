@@ -11,13 +11,18 @@
       </ng-container>
 
       <ng-container matColumnDef="tipoDocumento">
-        <th mat-header-cell *matHeaderCellDef> Tipo Doc. </th>
+        <th mat-header-cell *matHeaderCellDef> Doc. </th>
         <td mat-cell *matCellDef="let element"> {{element.tipoDocumento}} </td>
       </ng-container>
 
       <ng-container matColumnDef="numeroDocumento">
-        <th mat-header-cell *matHeaderCellDef> Nº Doc. </th>
+        <th mat-header-cell *matHeaderCellDef> Nº  </th>
         <td mat-cell *matCellDef="let element"> {{element.numeroDocumento}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="siaf">
+        <th mat-header-cell *matHeaderCellDef> SIAF </th>
+        <td mat-cell *matCellDef="let element"> {{element.siaf}} </td>
       </ng-container>
 
       <ng-container matColumnDef="aNombreDe">
@@ -61,7 +66,7 @@
       </ng-container>
 
       <ng-container matColumnDef="fechaDevengado">
-        <th mat-header-cell *matHeaderCellDef> F. Devengado </th>
+        <th mat-header-cell *matHeaderCellDef> F. Devengado SIAF </th>
         <td mat-cell *matCellDef="let element"> {{element.fechaDevengado | date:'dd/MM/yyyy'}} </td>
       </ng-container>
 
@@ -73,11 +78,6 @@
       <ng-container matColumnDef="meta">
         <th mat-header-cell *matHeaderCellDef> Meta </th>
         <td mat-cell *matCellDef="let element"> {{element.meta}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="siaf">
-        <th mat-header-cell *matHeaderCellDef> SIAF </th>
-        <td mat-cell *matCellDef="let element"> {{element.siaf}} </td>
       </ng-container>
 
       <ng-container matColumnDef="certificacionViatico">

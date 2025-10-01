@@ -1,33 +1,47 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title>Importar Gastos desde Excel</mat-card-title>
+    <mat-card-subtitle>Carga un archivo para procesar todas sus hojas automáticamente</mat-card-subtitle>
   </mat-card-header>
+  
   <mat-card-content>
-    <div *ngIf="!processing">
-      <input type="file" (change)="onFileChange($event)" #fileInput hidden accept=".xlsx, .xls, .csv">
-      <button mat-stroked-button color="primary" (click)="fileInput.click()">
-        Seleccionar Archivo de Ejecución
-      </button>
+    <input 
+      type="file" 
+      (change)="onFileChange($event)" 
+      id="file-input"
+      accept=".xlsx, .xls"
+      hidden
+      #fileInput 
+    />
 
-      <mat-form-field *ngIf="sheetNames.length > 1" class="sheet-selector">
-        <mat-label>Seleccione el mes (hoja) a procesar</mat-label>
-        <mat-select [(ngModel)]="selectedSheet" (selectionChange)="processSheet()">
-          <mat-option *ngFor="let sheet of sheetNames" [value]="sheet">
-            {{ sheet }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+    <button mat-raised-button color="primary" (click)="fileInput.click()" [disabled]="processing">
+      <span *ngIf="!fileName">Seleccionar Archivo</span>
+      <span *ngIf="fileName">Reemplazar: {{ fileName }}</span>
+    </button>
+    
+    <p *ngIf="fileName && !processing" class="file-info">
+      Archivo cargado: <strong>{{ fileName }}</strong>
+    </p>
 
-      <div *ngIf="fileName" class="file-info">
-        Archivo: <strong>{{ fileName }}</strong>
-        <span *ngIf="recordCount > 0"> ({{ recordCount }} filas de gastos encontradas)</span>
-      </div>
+    <div *ngIf="processing" class="progress-container">
+      <p>Procesando archivo, por favor espera...</p>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
-    <mat-progress-bar *ngIf="processing" mode="indeterminate"></mat-progress-bar>
+
+    <div *ngIf="recordCount > 0 && !processing" class="summary">
+      <p>
+        <strong>{{ recordCount }}</strong> registros válidos encontrados y listos para ser importados.
+      </p>
+    </div>
   </mat-card-content>
-  <mat-card-actions *ngIf="recordCount > 0 && !processing">
-    <button mat-raised-button color="accent" (click)="uploadData()">
-      Procesar y Guardar en Base de Datos
+
+  <mat-card-actions>
+    <button 
+      mat-raised-button 
+      color="accent" 
+      [disabled]="recordCount === 0 || processing" 
+      (click)="uploadData()">
+      Importar {{ recordCount }} Registros
     </button>
   </mat-card-actions>
 </mat-card>
