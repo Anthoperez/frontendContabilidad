@@ -1,9 +1,18 @@
-<mat-toolbar color="primary">
-  <span>Sistema de Registro de Gastos</span>
-</mat-toolbar>
+<div class="header">
+  <h1>Sistema de Gestión de Gastos</h1>
+</div>
 
-<main class="content">
-  <app-gasto-form (gastoCreado)="actualizarLista()"></app-gasto-form>
-  <app-excel-importer (importComplete)="actualizarLista()"></app-excel-importer>
-  <app-gasto-list></app-gasto-list>
-</main>
+<div class="main-container">
+  <div class="importer-form-container">
+    <app-gasto-form (gastoCreado)="onGastoCreado()"></app-gasto-form>
+    <app-excel-importer (importComplete)="onImportComplete()"></app-excel-importer>
+  </div>
+
+  <div class="report-container">
+    <app-report-generator></app-report-generator>
+  </div>
+
+  <div class="list-container">
+    <app-gasto-list></app-gasto-list>
+  </div>
+</div>

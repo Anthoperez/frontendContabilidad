@@ -1,0 +1,34 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Generador de Reportes</mat-card-title>
+    <mat-card-subtitle>Selecciona un proyecto para generar su reporte en Excel</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div *ngIf="isLoading" class="spinner-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando...</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <mat-form-field appearance="fill" class="project-selector">
+        <mat-label>Seleccionar Proyecto</mat-label>
+        <mat-select [(ngModel)]="selectedProject">
+          <mat-option *ngFor="let project of projects" [value]="project">
+            {{ project }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button
+      mat-raised-button
+      color="accent"
+      [disabled]="!selectedProject || isLoading"
+      (click)="generateReport()">
+      Generar y Descargar Reporte
+    </button>
+  </mat-card-actions>
+</mat-card>
