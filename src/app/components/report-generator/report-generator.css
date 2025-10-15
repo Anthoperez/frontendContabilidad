@@ -1,0 +1,83 @@
+/* --- Estilos Generales de la Tarjeta --- */
+.report-generator-card {
+  max-width: 500px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.card-content {
+  padding: 24px !important;
+}
+
+/* --- Contenedor de Estados (Cargando y Vacío) --- */
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  color: #666;
+}
+
+.state-container p {
+  margin-top: 16px;
+  font-size: 1rem;
+}
+
+.empty-state .empty-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #bdbdbd;
+}
+
+.empty-state h3 {
+  margin: 16px 0 8px;
+  color: #333;
+}
+
+/* --- Contenedor de Acción Principal --- */
+.action-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.report-illustration {
+  width: 150px;
+  margin-bottom: 24px;
+}
+
+.instruction-text {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 24px;
+}
+
+.project-selector {
+  width: 100%;
+  max-width: 350px;
+}
+
+.project-selector mat-icon {
+  margin-right: 8px;
+  color: #777;
+}
+
+/* --- Botón de Generar --- */
+.generate-button {
+  width: 100%;
+  max-width: 350px;
+  margin-top: 16px;
+  padding: 12px 0;
+  font-size: 1rem;
+}
+
+.generate-button mat-icon,
+.generate-button mat-progress-spinner {
+  margin-right: 12px;
+}
+
+.generate-button span {
+  line-height: 24px; /* Alinea el texto con el spinner */
+}

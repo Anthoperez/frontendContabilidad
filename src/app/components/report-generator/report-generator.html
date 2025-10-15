@@ -1,34 +1,55 @@
-<mat-card>
+<mat-card class="report-generator-card">
   <mat-card-header>
     <mat-card-title>Generador de Reportes</mat-card-title>
-    <mat-card-subtitle>Selecciona un proyecto para generar su reporte en Excel</mat-card-subtitle>
+    <mat-card-subtitle>Genera un informe detallado en formato Excel para cualquier proyecto</mat-card-subtitle>
   </mat-card-header>
 
-  <mat-card-content>
-    <div *ngIf="isLoading" class="spinner-container">
+  <mat-card-content class="card-content">
+    <div *ngIf="isLoading" class="state-container">
       <mat-spinner diameter="50"></mat-spinner>
-      <p>Cargando...</p>
+      <p>Cargando proyectos...</p>
     </div>
 
-    <div *ngIf="!isLoading">
-      <mat-form-field appearance="fill" class="project-selector">
+    <div *ngIf="!isLoading && projects.length === 0" class="state-container empty-state">
+      <mat-icon class="empty-icon">folder_off</mat-icon>
+      <h3>No hay proyectos disponibles</h3>
+      <p>Cuando agregues gastos a un nuevo proyecto, aparecerá aquí.</p>
+    </div>
+
+    <div *ngIf="!isLoading && projects.length > 0" class="action-container">
+      <img src="/frontend/assets/reporte.png" alt="Ilustración de reporte" class="report-illustration">
+      
+      <p class="instruction-text">
+        Elige el proyecto del cual deseas obtener el reporte.
+      </p>
+
+      <mat-form-field appearance="outline" class="project-selector">
         <mat-label>Seleccionar Proyecto</mat-label>
+        <mat-icon matPrefix>topic</mat-icon>
         <mat-select [(ngModel)]="selectedProject">
           <mat-option *ngFor="let project of projects" [value]="project">
             {{ project }}
           </mat-option>
         </mat-select>
       </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="accent"
+        class="generate-button"
+        [disabled]="!selectedProject || isGenerating"
+        (click)="generateReport()">
+        
+        <ng-container *ngIf="!isGenerating">
+          <mat-icon>download</mat-icon>
+          Generar y Descargar Reporte
+        </ng-container>
+
+        <ng-container *ngIf="isGenerating">
+          <mat-progress-spinner mode="indeterminate" diameter="24"></mat-progress-spinner>
+          <span>Generando...</span>
+        </ng-container>
+      </button>
     </div>
   </mat-card-content>
-
-  <mat-card-actions>
-    <button
-      mat-raised-button
-      color="accent"
-      [disabled]="!selectedProject || isLoading"
-      (click)="generateReport()">
-      Generar y Descargar Reporte
-    </button>
-  </mat-card-actions>
 </mat-card>

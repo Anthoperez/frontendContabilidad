@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-report-generator',
@@ -22,7 +23,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatSelectModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatIconModule
   ],
   templateUrl: './report-generator.html',
   styleUrls: ['./report-generator.css']
@@ -31,6 +33,7 @@ export class ReportGeneratorComponent implements OnInit {
   projects: string[] = [];
   selectedProject: string = '';
   isLoading = false;
+isGenerating: unknown;
 
   constructor(private apiService: ApiService, private snackBar: MatSnackBar) {}
 

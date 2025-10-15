@@ -9,13 +9,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-excel-importer',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatCardModule, MatButtonModule, MatProgressBarModule, 
-    MatSnackBarModule
+    MatSnackBarModule, MatIconModule
   ],
   templateUrl: './excel-importer.html',
   styleUrls: ['./excel-importer.css']

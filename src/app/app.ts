@@ -1,19 +1,18 @@
 // src/app/app.component.ts
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
-import { GastoFormComponent } from './components/gasto-form/gasto-form';
-import { GastoListComponent } from './components/gasto-list/gasto-list';
-import { ExcelImporterComponent } from './components/excel-importer/excel-importer'; // <-- Importa
-import { ReportGeneratorComponent } from './components/report-generator/report-generator';
-
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 // Importaciones de Angular Material
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { GastoListComponent } from './components/gasto-list/gasto-list';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, GastoFormComponent, GastoListComponent, MatToolbarModule, ExcelImporterComponent, ReportGeneratorComponent],
+  imports: [CommonModule, MatToolbarModule, MatSidenavModule, MatListModule, MatIconModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
