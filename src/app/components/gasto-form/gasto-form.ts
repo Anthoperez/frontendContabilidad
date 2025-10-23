@@ -27,7 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class GastoFormComponent {
   @Output() gastoCreado = new EventEmitter<void>();
   tiposDocumento = ['C/S', 'P/S', 'O/S', 'R.DGA', 'O/C'];
-  fuentesFinanciamiento = ['D Y T', 'R.DET', 'R.D', '9'];
+  fuentesFinanciamiento = ['D Y T', 'R.DET', 'R.D'];
   meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
 
   // 1. Declaramos la propiedad del formulario aquí
@@ -41,18 +41,18 @@ export class GastoFormComponent {
       numeroDocumento: ['', Validators.required],
       aNombreDe: ['', Validators.required],
       concepto: ['', Validators.required],
-      monto: [null as number | null, [Validators.required, Validators.min(0.01)]],
+      monto: [null as number | null, [Validators.required]],
       especifica: ['', Validators.required],
       fechaDevengado: [null as Date | null, Validators.required],
       proyecto: ['', Validators.required],
       mes: ['', Validators.required],
       meta: ['', Validators.required],
+      siaf: ['', Validators.required],
+      ff: ['', Validators.required],
 
       // --- CAMPOS OPCIONALES (sin Validators.required) ---
-      siaf: [''],
       monto2: [null as number | null],
       especifica2: [''],
-      ff: [''],
       certificacionViatico: [''],
       destino: [''],
       fechaSalida: [null as Date | null],

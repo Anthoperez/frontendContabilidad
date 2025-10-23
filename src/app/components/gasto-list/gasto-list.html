@@ -1,107 +1,200 @@
 <mat-card>
-  <mat-card-header>
-    <mat-card-title>Gastos Registrados</mat-card-title>
-  </mat-card-header>
+    <mat-card-header>     <mat-card-title>Gastos Registrados</mat-card-title>   </mat-card-header>  
   <mat-card-content class="table-container">
+       
     <table mat-table [dataSource]="gastos" class="mat-elevation-z8">
-
+           
       <ng-container matColumnDef="fechaRegistro">
-        <th mat-header-cell *matHeaderCellDef> F. Registro </th>
-        <td mat-cell *matCellDef="let element"> {{element.fechaRegistro | date:'short'}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>F. Registro</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.fechaRegistro | date : 'short' }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="tipoDocumento">
-        <th mat-header-cell *matHeaderCellDef> Doc. </th>
-        <td mat-cell *matCellDef="let element"> {{element.tipoDocumento}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Doc.</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.tipoDocumento }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="numeroDocumento">
-        <th mat-header-cell *matHeaderCellDef> Nº  </th>
-        <td mat-cell *matCellDef="let element"> {{element.numeroDocumento}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Nº  </th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.numeroDocumento }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="siaf">
-        <th mat-header-cell *matHeaderCellDef> SIAF </th>
-        <td mat-cell *matCellDef="let element"> {{element.siaf}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>SIAF</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.siaf }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="aNombreDe">
-        <th mat-header-cell *matHeaderCellDef> A Nombre De </th>
-        <td mat-cell *matCellDef="let element"> {{element.aNombreDe}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>A Nombre De</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.aNombreDe }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="concepto">
-        <th mat-header-cell *matHeaderCellDef> Concepto </th>
-        <td mat-cell *matCellDef="let element"> {{element.concepto}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Concepto</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.concepto }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="monto">
-        <th mat-header-cell *matHeaderCellDef> Monto </th>
-        <td mat-cell *matCellDef="let element" class="monto-cell"> {{element.monto | currency:'S/ '}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Monto</th>
+               
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="monto-cell"
+          [ngClass]="{ 'monto-negativo': element.monto < 0 }"
+        >
+          {{ element.monto | currency : 'S/ ' }}
+        </td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="monto2">
-        <th mat-header-cell *matHeaderCellDef> Monto 2 </th>
-        <td mat-cell *matCellDef="let element" class="monto-cell"> {{element.monto2 | currency:'S/ '}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Monto 2</th>
+               
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="monto-cell"
+          [ngClass]="{ 'monto-negativo': element.monto2 < 0 }"
+        >
+          {{ element.monto2 | currency : 'S/ ' }}
+        </td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="especifica">
-        <th mat-header-cell *matHeaderCellDef> Específica </th>
-        <td mat-cell *matCellDef="let element"> {{element.especifica}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Específica</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.especifica }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="especifica2">
-        <th mat-header-cell *matHeaderCellDef> Específica 2 </th>
-        <td mat-cell *matCellDef="let element"> {{element.especifica2}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Específica 2</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.especifica2 }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="ff">
-        <th mat-header-cell *matHeaderCellDef> FF </th>
-        <td mat-cell *matCellDef="let element"> {{element.ff}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>FF</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.ff }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="mes">
-        <th mat-header-cell *matHeaderCellDef> Mes </th>
-        <td mat-cell *matCellDef="let element"> {{element.mes}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Mes</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.mes }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="fechaDevengado">
-        <th mat-header-cell *matHeaderCellDef> F. Devengado SIAF </th>
-        <td mat-cell *matCellDef="let element"> {{element.fechaDevengado | date:'dd/MM/yyyy'}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>F. Devengado SIAF</th>
+               
+        <td mat-cell *matCellDef="let element">
+          {{ element.fechaDevengado | date : 'dd/MM/yyyy' }}
+        </td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="proyecto">
-        <th mat-header-cell *matHeaderCellDef> Proyecto </th>
-        <td mat-cell *matCellDef="let element"> {{element.proyecto}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Proyecto</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.proyecto }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="meta">
-        <th mat-header-cell *matHeaderCellDef> Meta </th>
-        <td mat-cell *matCellDef="let element"> {{element.meta}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Meta</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.meta }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="certificacionViatico">
-        <th mat-header-cell *matHeaderCellDef> Cert. Viático </th>
-        <td mat-cell *matCellDef="let element"> {{element.certificacionViatico}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Cert. Viático</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.certificacionViatico }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="destino">
-        <th mat-header-cell *matHeaderCellDef> Destino </th>
-        <td mat-cell *matCellDef="let element"> {{element.destino}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>Destino</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.destino }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="fechaSalida">
-        <th mat-header-cell *matHeaderCellDef> F. Salida </th>
-        <td mat-cell *matCellDef="let element"> {{element.fechaSalida | date:'dd/MM/yyyy'}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>F. Salida</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.fechaSalida | date : 'dd/MM/yyyy' }}</td>
+             
       </ng-container>
 
+           
       <ng-container matColumnDef="fechaRetorno">
-        <th mat-header-cell *matHeaderCellDef> F. Retorno </th>
-        <td mat-cell *matCellDef="let element"> {{element.fechaRetorno | date:'dd/MM/yyyy'}} </td>
+               
+        <th mat-header-cell *matHeaderCellDef>F. Retorno</th>
+               
+        <td mat-cell *matCellDef="let element">{{ element.fechaRetorno | date : 'dd/MM/yyyy' }}</td>
+             
       </ng-container>
 
+           
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+           
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+         
     </table>
   </mat-card-content>
 </mat-card>

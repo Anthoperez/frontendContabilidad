@@ -1,18 +1,18 @@
 .table-container {
   overflow-x: auto; /* Permite el scroll horizontal */
-    max-width: 100%;
-    margin-top: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background-color: #fff;
-    padding: 10px;
+  max-width: 100%;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 10px;
 
 }
 
 table {
   width: 100%;
-    border-collapse: collapse;
-    min-width: 800px; /* Asegura un ancho mínimo para la tabla */
+  border-collapse: collapse;
+  min-width: 800px; /* Asegura un ancho mínimo para la tabla */
 
 }
 
@@ -20,12 +20,12 @@ table {
   text-align: right;
   font-weight: bold;
   min-width: 120px; /* Evita que la columna de monto se encoja mucho */
-    color: #2E7D32; /* Color verde para los montos */
-    background-color: #E8F5E9; /* Fondo verde claro para la columna de monto */
-    border-radius: 4px;
-    padding: 5px 10px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
+  color: #2E7D32; /* Color verde para los montos */
+  background-color: #E8F5E9; /* Fondo verde claro para la columna de monto */
+  border-radius: 4px;
+  padding: 5px 10px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
 
 
 }
@@ -35,7 +35,14 @@ th.mat-header-cell, td.mat-cell {
   white-space: nowrap; /* Evita que el texto se divida en varias líneas */
   text-overflow: ellipsis; /* Añade "..." si el texto es demasiado largo */
   overflow: hidden; /* Oculta el desbordamiento */
-    max-width: 150px; /* Limita el ancho máximo de las celdas */
-    border-bottom: 1px solid #e0e0e0;
+  max-width: 150px; /* Limita el ancho máximo de las celdas */
+  border-bottom: 1px solid #e0e0e0;
 
 }
+
+/* ▼▼▼ MODIFICACIÓN AQUÍ (AÑADIR ESTA CLASE) ▼▼▼ */
+.monto-negativo {
+  color: #D32F2F !important; /* Rojo oscuro */
+  background-color: #FFEBEE !important; /* Fondo rojo claro */
+}
+/* ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲ */

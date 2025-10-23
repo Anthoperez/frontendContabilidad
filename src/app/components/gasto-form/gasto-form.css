@@ -1,61 +1,58 @@
-/* Contenedor de página para centrar el formulario y dar aire */
+/* Contenedor general */
 .page-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 24px;
-  background-color: #f5f5f5; /* Un fondo sutil para la página */
+  background-color: #f5f5f5;
+  min-height: 100vh;
 }
 
-/* Título principal de la página */
+/* Título */
 h1 {
   color: #333;
   margin-bottom: 24px;
+  font-weight: 600;
 }
 
-/* El formulario ahora es un contenedor de tarjetas, apiladas verticalmente */
+/* Formulario principal */
 .form-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px; /* Espacio entre las tarjetas */
+  background: #fff;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 900px; /* Ancho máximo para el formulario */
+  max-width: 900px;
 }
 
-/* Estilo para los encabezados de las tarjetas */
-mat-card-header {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  margin-bottom: 16px;
-}
-
-/* Clase para la rejilla DENTRO de cada tarjeta. 
-  Es responsive: mostrará 1, 2 o más columnas según el espacio.
-*/
+/* Rejilla de campos */
 .section-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* antes 260px */
+  gap: 16px; /* un poco menos de espacio entre columnas */
 }
 
-/* Mantiene la funcionalidad de que un campo ocupe todo el ancho de la rejilla */
+
+/* Campos de ancho completo */
 .full-width {
   grid-column: 1 / -1;
 }
 
-/* Contenedor para el botón de envío */
+/* Contenedor del botón */
 .actions-container {
   display: flex;
-  justify-content: flex-end; /* Alinea el botón a la derecha */
-  margin-top: 8px;
+  justify-content: flex-end;
+  margin-top: 24px;
 }
 
-/* Estilo para el botón de registro */
+/* Botón */
 .actions-container button {
-  padding: 8px 24px;
+  padding: 10px 28px;
   font-size: 16px;
+  border-radius: 8px;
 }
 
-/* Añade un icono al botón para mejorar la claridad visual */
+/* Ícono del botón */
 .actions-container mat-icon {
   margin-right: 8px;
 }
