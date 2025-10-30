@@ -1,9 +1,14 @@
+// src/app/components/report-generator/report-generator.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../services/api';
+// ▼▼▼ AÑADIR ESTAS IMPORTACIONES ▼▼▼
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ReportMetadataDialogComponent } from '../report-metadata-dialog/report-metadata-dialog';
+import { ApiService, ReportMetadata } from '../../services/api'; // Importa ApiService y la nueva interfaz
+// ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
-// Importaciones de Angular Material
+// Importaciones de Angular Material (existentes)
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,37 +18,43 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-report-generator',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatIconModule
-  ],
-  templateUrl: './report-generator.html',
-  styleUrls: ['./report-generator.css']
+  selector: 'app-report-generator',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatIconModule,
+    MatDialogModule, // <-- AÑADIR ESTO
+  ],
+  templateUrl: './report-generator.html',
+  styleUrls: ['./report-generator.css']
 })
 export class ReportGeneratorComponent implements OnInit {
-  projects: string[] = [];
-  selectedProject: string = '';
-  isLoading = false;
-isGenerating: unknown;
+  projects: string[] = [];
+  selectedProject: string = '';
+  isLoading = false;
+  isGenerating = false; // <-- CORREGIDO (estaba como 'unknown')
 
-  constructor(private apiService: ApiService, private snackBar: MatSnackBar) {}
+  // ▼▼▼ INYECTAR 'MatDialog' ▼▼▼
+  constructor(
+    private apiService: ApiService, 
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog // <-- AÑADIR ESTO
+  ) {}
+  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
-  ngOnInit(): void {
-    this.loadProjects();
-  }
+  ngOnInit(): void {
+    this.loadProjects();
+  }
 
-  // Carga la lista de proyectos desde el backend
-  loadProjects(): void {
-    this.isLoading = true;
+  loadProjects(): void {
+    this.isLoading = true;
     this.apiService.getProjects().subscribe({
       next: (data) => {
         this.projects = data;
@@ -54,47 +65,63 @@ isGenerating: unknown;
         this.showError('No se pudo cargar la lista de proyectos.');
       }
     });
-  }
+  }
 
-  // Se ejecuta cuando el usuario presiona el botón de generar
-  generateReport(): void {
-    if (!this.selectedProject) {
-      this.showError('Por favor, selecciona un proyecto.');
-      return;
-    }
+  // ▼▼▼ MÉTODO 'generateReport' COMPLETAMENTE MODIFICADO ▼▼▼
+  generateReport(): void {
+    if (!this.selectedProject) {
+      this.showError('Por favor, selecciona un proyecto.');
+      return;
+    }
 
-    this.isLoading = true;
-    this.apiService.downloadReport(this.selectedProject).subscribe({
-      next: (blob) => {
-        // Lógica para descargar el archivo en el navegador del usuario
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        
-        // Creamos un nombre de archivo seguro
-        const safeProjectName = this.selectedProject.replace(/[^a-z0-9]/gi, '_');
-        a.download = `Reporte_${safeProjectName}.xlsx`;
-        
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
-        
-        this.isLoading = false;
-        this.showSuccess('¡Reporte generado y descargado!');
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.showError('Ocurrió un error al generar el reporte.');
-        console.error('Error al descargar:', err);
-      }
+    // 1. Abrir el diálogo
+    const dialogRef = this.dialog.open(ReportMetadataDialogComponent, {
+      width: '600px',
+      disableClose: true, // Evita que se cierre al hacer clic fuera
     });
-  }
-  
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Cerrar', { duration: 5000 });
-  }
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Ok', { duration: 3000 });
-  }
+
+    // 2. Escuchar a cuando se cierre el diálogo
+    dialogRef.afterClosed().subscribe((metadata: ReportMetadata | undefined) => {
+      
+      // Si el usuario presionó "Cancelar", metadata será 'undefined'
+      if (metadata === undefined) {
+        return; 
+      }
+      
+      // Si el usuario presionó "Omitir" o "Generar", 'metadata' será un objeto
+      // (vacío si omitió, con datos si llenó)
+      this.isGenerating = true;
+
+      // 3. Llamar a la API con el projectName y los metadatos
+      this.apiService.downloadReport(this.selectedProject, metadata).subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const safeProjectName = this.selectedProject.replace(/[^a-z0-9]/gi, '_');
+          a.download = `Reporte_${safeProjectName}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          a.remove();
+          
+          this.isGenerating = false;
+          this.showSuccess('¡Reporte generado y descargado!');
+        },
+        error: (err) => {
+          this.isGenerating = false;
+          this.showError('Ocurrió un error al generar el reporte.');
+          console.error('Error al descargar:', err);
+        }
+      });
+    });
+  }
+  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+  
+  private showError(message: string): void {
+    this.snackBar.open(message, 'Cerrar', { duration: 5000 });
+  }
+  private showSuccess(message: string): void {
+    this.snackBar.open(message, 'Ok', { duration: 3000 });
+  }
 }

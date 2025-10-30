@@ -1,0 +1,151 @@
+<h2 mat-dialog-title>Completar Datos del Reporte (Opcional)</h2>
+<mat-dialog-content class="dialog-content"> <p>Puedes llenar esta información ahora, o dejarla en blanco para llenarla en el Excel.</p>
+  
+  <form [formGroup]="metadataForm" class="metadata-form">
+    
+    <h3>Investigador y Proyecto</h3>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre del Investigador</mat-label>
+      <input matInput formControlName="investigador">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Resolución (Ej: R.R. Nº 1825-2024/UNT)</mat-label>
+      <input matInput formControlName="rr_investigador">
+    </mat-form-field>
+
+    <div class="date-duration-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de Inicio</mat-label>
+        <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio">
+        <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Duración (Ej: 18 meses)</mat-label>
+        <input matInput formControlName="duracion">
+      </mat-form-field>
+    </div>
+
+    <hr>
+
+    <h3>Descripción de Presupuesto</h3>
+    <div class="presupuesto-grid">
+      <div></div> <div class="header-cell">Aporte No Monetario (Valorizado S/)</div>
+      <div class="header-cell">Aporte Monetario S/</div>
+      <div class="header-cell">Aporte Total S/</div>
+
+      <div class="label-cell">PROCIENCIA</div>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" formControlName="presupuestoProcienciaAporteNoMonetario" placeholder="0.00">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" formControlName="presupuestoProcienciaAporteMonetario" placeholder="0.00">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" 
+               [value]="(metadataForm.get('presupuestoProcienciaAporteNoMonetario')?.value || 0) + 
+                        (metadataForm.get('presupuestoProcienciaAporteMonetario')?.value || 0)" 
+               readonly placeholder="0.00">
+      </mat-form-field>
+
+      <div class="label-cell">Entidad Ejecutora</div>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" formControlName="presupuestoEntidadEjecutoraAporteNoMonetario" placeholder="0.00">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" formControlName="presupuestoEntidadEjecutoraAporteMonetario" placeholder="0.00">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" 
+               [value]="(metadataForm.get('presupuestoEntidadEjecutoraAporteNoMonetario')?.value || 0) + 
+                        (metadataForm.get('presupuestoEntidadEjecutoraAporteMonetario')?.value || 0)" 
+               readonly placeholder="0.00">
+      </mat-form-field>
+
+      <div class="label-cell">Entidad Asociada</div>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" formControlName="presupuestoEntidadAsociadaAporteNoMonetario" placeholder="0.00">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" formControlName="presupuestoEntidadAsociadaAporteMonetario" placeholder="0.00">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput type="number" 
+               [value]="(metadataForm.get('presupuestoEntidadAsociadaAporteNoMonetario')?.value || 0) + 
+                        (metadataForm.get('presupuestoEntidadAsociadaAporteMonetario')?.value || 0)" 
+               readonly placeholder="0.00">
+      </mat-form-field>
+    </div>
+    <hr>
+
+    <h3>Sección de Ingresos</h3>
+    <div formArrayName="ingresos">
+      <div *ngFor="let ingreso of ingresos.controls; let i=index" [formGroupName]="i" class="ingreso-row">
+        
+        <mat-form-field appearance="outline" class="ingreso-desc">
+          <mat-label>Descripción del Ingreso (Ej: R.R Nº...)</mat-label>
+          <textarea matInput formControlName="descripcion" rows="2"></textarea> </mat-form-field>
+
+        <mat-form-field appearance="outline" class="ingreso-monto">
+          <mat-label>Monto</mat-label>
+          <input matInput type="number" formControlName="monto">
+        </mat-form-field>
+
+        <button mat-icon-button color="warn" (click)="eliminarIngreso(i)" type="button">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <button mat-stroked-button color="primary" type="button" (click)="nuevoIngreso()">
+      <mat-icon>add</mat-icon>
+      Añadir Fila de Ingreso
+    </button>
+
+    <hr>
+
+    <h3>Ejecución de Gastos - Año Anterior ({{ metadataForm.get('gastosAnoAnterior.year')?.value }})</h3>
+    <div formGroupName="gastosAnoAnterior" class="gastos-anterior-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Año</mat-label>
+        <input matInput type="number" formControlName="year">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Bienes Corrientes</mat-label>
+        <input matInput type="number" formControlName="bienesCorrientes">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Bienes Capital</mat-label>
+        <input matInput type="number" formControlName="bienesCapital">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Servicios</mat-label>
+        <input matInput type="number" formControlName="servicios">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Subvención</mat-label>
+        <input matInput type="number" formControlName="subvencion">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Viáticos</mat-label>
+        <input matInput type="number" formControlName="viaticos">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Encargo Interno</mat-label>
+        <input matInput type="number" formControlName="encargoInterno">
+      </mat-form-field>
+    </div>
+    </form>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="dialogRef.close(undefined)">Cancelar</button>
+  
+  <button mat-button type="button" (click)="onOmitir()">Omitir y Generar</button>
+
+  <button mat-raised-button color="accent" type="button" (click)="onGenerar()"> Generar Reporte con Datos
+  </button>
+</mat-dialog-actions>
