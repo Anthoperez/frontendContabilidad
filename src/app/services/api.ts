@@ -77,10 +77,25 @@ export class ApiService {
       metadata: metadata,
     };
 
+    
+
     // Cambiamos de GET a POST y enviamos el 'body'
     return this.http.post(`${this.apiUrl}/reports/generate`, body, {
       responseType: 'blob', // ¡Esto sigue siendo muy importante!
     });
   }
   // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
+  // ▼▼▼ AÑADIR ESTE NUEVO MÉTODO ▼▼▼
+  /**
+   * Genera un reporte global con todos los gastos agrupados por Meta.
+   */
+  downloadReportByMeta(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reports/by-meta`, {
+      responseType: 'blob', // ¡Muy importante!
+    });
+  }
+  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
+  
 }
