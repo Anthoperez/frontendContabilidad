@@ -26,8 +26,8 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class GastoFormComponent {
   @Output() gastoCreado = new EventEmitter<void>();
-  tiposDocumento = ['C/S', 'P/S', 'O/S', 'R.DGA', 'O/C'];
-  fuentesFinanciamiento = ['D Y T', 'R.DET', 'R.D'];
+  tiposDocumento = ['P/V', 'P/S', 'O/S', 'R.DGA', 'O/C']; //no es C/S es P/V
+  fuentesFinanciamiento = ['D Y T', 'R.DET', 'R.D.R']; // no es R.D es R.D.R
   meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
 
   // 1. Declaramos la propiedad del formulario aquí
