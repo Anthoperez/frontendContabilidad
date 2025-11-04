@@ -1,27 +1,32 @@
 <div class="page-container">
-  <h1>Nuevo Registro</h1>
+  <h1>Registro de Nuevo Gasto</h1>
 
   <form [formGroup]="gastoForm" (ngSubmit)="onSubmit()" class="form-container">
     <div class="section-grid">
-      <!-- Datos Principales -->
       <mat-form-field>
         <mat-label>DOC</mat-label>
         <mat-select formControlName="tipoDocumento">
-          <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo">{{ tipo }}</mat-option>
+          <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo">{{
+            tipo
+          }}</mat-option>
         </mat-select>
         <mat-error>Campo requerido</mat-error>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Nº Documento</mat-label>
-        <input matInput formControlName="numeroDocumento" />
+        <input
+          matInput
+          formControlName="numeroDocumento"
+          (blur)="padField('numeroDocumento', 4)"
+          placeholder="Ej: 20"
+        />
         <mat-error>Campo requerido</mat-error>
       </mat-form-field>
 
-
       <mat-form-field>
         <mat-label>SIAF</mat-label>
-        <input matInput formControlName="siaf" />
+        <input matInput formControlName="siaf" (blur)="padField('siaf', 4)" placeholder="Ej: 4487" />
       </mat-form-field>
 
       <mat-form-field>
@@ -36,10 +41,16 @@
         <mat-error>Campo requerido</mat-error>
       </mat-form-field>
 
-      <!-- Detalles Financieros -->
       <mat-form-field>
         <mat-label>Monto Principal</mat-label>
-        <input matInput type="number" formControlName="monto" />
+        <input
+          matInput
+          type="text"
+          formControlName="monto"
+          (focus)="onCurrencyFocus($event)"
+          (blur)="onCurrencyBlur($event, 'monto')"
+          placeholder="Ej: 23,500.50"
+        />
         <mat-error>Monto requerido</mat-error>
       </mat-form-field>
 
@@ -51,8 +62,15 @@
 
       <mat-form-field>
         <mat-label>Monto 2 (Opcional)</mat-label>
-        <input matInput type="number" formControlName="monto2" />
-      </mat-form-field>
+        <input
+          matInput
+          type="text"
+          formControlName="monto2"
+          (focus)="onCurrencyFocus($event)"
+          (blur)="onCurrencyBlur($event, 'monto2')"
+          placeholder="Ej: 100.00"
+        />
+        </mat-form-field>
 
       <mat-form-field>
         <mat-label>Específica 2 (Opcional)</mat-label>
@@ -76,13 +94,19 @@
 
       <mat-form-field>
         <mat-label>F. Devengado SIAF</mat-label>
-        <input matInput [matDatepicker]="pickerDevengado" formControlName="fechaDevengado" />
-        <mat-datepicker-toggle matSuffix [for]="pickerDevengado"></mat-datepicker-toggle>
+        <input
+          matInput
+          [matDatepicker]="pickerDevengado"
+          formControlName="fechaDevengado"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="pickerDevengado"
+        ></mat-datepicker-toggle>
         <mat-datepicker #pickerDevengado></mat-datepicker>
         <mat-error>Campo requerido</mat-error>
       </mat-form-field>
 
-      <!-- Asignación y Viáticos -->
       <mat-form-field>
         <mat-label>PROYECTO</mat-label>
         <input matInput formControlName="proyecto" />
@@ -91,7 +115,7 @@
 
       <mat-form-field>
         <mat-label>Meta</mat-label>
-        <input matInput formControlName="meta" />
+        <input matInput formControlName="meta" (blur)="padField('meta', 4)" placeholder="Ej: 4487" />
         <mat-error>Campo requerido</mat-error>
       </mat-form-field>
 
@@ -107,24 +131,48 @@
 
       <mat-form-field>
         <mat-label>Fecha Salida</mat-label>
-        <input matInput [matDatepicker]="pickerSalida" formControlName="fechaSalida" />
-        <mat-datepicker-toggle matSuffix [for]="pickerSalida"></mat-datepicker-toggle>
+        <input
+          matInput
+          [matDatepicker]="pickerSalida"
+          formControlName="fechaSalida"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="pickerSalida"
+        ></mat-datepicker-toggle>
         <mat-datepicker #pickerSalida></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Fecha Retorno</mat-label>
-        <input matInput [matDatepicker]="pickerRetorno" formControlName="fechaRetorno" />
-        <mat-datepicker-toggle matSuffix [for]="pickerRetorno"></mat-datepicker-toggle>
+        <input
+          matInput
+          [matDatepicker]="pickerRetorno"
+          formControlName="fechaRetorno"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="pickerRetorno"
+        ></mat-datepicker-toggle>
         <mat-datepicker #pickerRetorno></mat-datepicker>
       </mat-form-field>
     </div>
 
     <div class="actions-container">
-      <button mat-raised-button color="primary" type="submit" [disabled]="gastoForm.invalid">
+      <button mat-stroked-button color="warn" type="button" (click)="cancelar()">
+        <mat-icon>cancel</mat-icon>
+        Cancelar
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="gastoForm.invalid"
+      >
         <mat-icon>save</mat-icon>
         Registrar Gasto
       </button>
     </div>
-  </form>
+    </form>
 </div>

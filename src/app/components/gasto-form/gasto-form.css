@@ -43,6 +43,7 @@ h1 {
   display: flex;
   justify-content: flex-end;
   margin-top: 24px;
+  gap: 16px; /* <-- AÑADE ESTA LÍNEA */
 }
 
 /* Botón */

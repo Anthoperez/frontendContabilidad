@@ -9,6 +9,14 @@
   padding: 24px !important;
 }
 
+/* ▼▼▼ AÑADIR ESTE NUEVO ESTILO ▼▼▼ */
+.report-toggle-group {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+/* ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲ */
+
 /* --- Contenedor de Estados (Cargando y Vacío) --- */
 .state-container {
   display: flex;

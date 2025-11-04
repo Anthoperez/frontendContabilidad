@@ -1,50 +1,116 @@
 <mat-card class="report-generator-card">
-      <mat-card-header>
-            <mat-card-title>Generador de Reportes</mat-card-title>
-            <mat-card-subtitle>Genera un informe detallado en formato Excel para cualquier proyecto</mat-card-subtitle>
-          </mat-card-header>
+  <mat-card-header>
+    <mat-card-title>Generador de Reportes</mat-card-title>
+    <mat-card-subtitle
+      >Selecciona el tipo de reporte que deseas generar</mat-card-subtitle
+    >
+  </mat-card-header>
 
-      <mat-card-content class="card-content">
-            <div *ngIf="isLoading && !isGenerating" class="state-container">       <mat-spinner
-                diameter="50"></mat-spinner>
-                  <p>Cargando proyectos...</p>
-                </div>
+  <mat-card-content class="card-content">
+    
+    <mat-button-toggle-group
+      [(ngModel)]="reportType"
+      class="report-toggle-group"
+      aria-label="Tipo de Reporte"
+    >
+      <mat-button-toggle value="project">Por Proyecto</mat-button-toggle>
+      <mat-button-toggle value="meta">Por Meta (Global)</mat-button-toggle>
+    </mat-button-toggle-group>
+    <div *ngIf="reportType === 'project'">
+      <div *ngIf="isLoading" class="state-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando proyectos...</p>
+      </div>
 
-            <div *ngIf="!isLoading && projects.length === 0" class="state-container empty-state">
-                  <mat-icon class="empty-icon">folder_off</mat-icon>
-                  <h3>No hay proyectos disponibles</h3>
-                  <p>Importa un archivo Excel o registra gastos para ver proyectos aquí.</p>
-                </div>
+      <div
+        *ngIf="!isLoading && projects.length === 0"
+        class="state-container empty-state"
+      >
+        <mat-icon class="empty-icon">folder_off</mat-icon>
+        <h3>No hay proyectos disponibles</h3>
+        <p>Cuando agregues gastos a un nuevo proyecto, aparecerá aquí.</p>
+      </div>
 
-          <div *ngIf="!isLoading && projects.length > 0" class="action-container">
-              <img src="assets/reporte.png" alt="Ilustración de reporte" class="report-illustration">   <p
-                class="instruction-text">
-                    Elige el proyecto del cual deseas obtener el reporte.
-                  </p>
+      <div
+        *ngIf="!isLoading && projects.length > 0"
+        class="action-container"
+      >
+        <img
+          src="/assets/reporte.png"
+          alt="Ilustración de reporte"
+          class="report-illustration"
+        />
 
-              <mat-form-field appearance="outline" class="project-selector">
-                    <mat-label>Seleccionar Proyecto</mat-label>
-                    <mat-icon matPrefix>topic</mat-icon>
-                    <mat-select [(ngModel)]="selectedProject" [disabled]="isGenerating">   <mat-option
-                        *ngFor="let project of projects" [value]="project">
-                            {{ project }}
-                          </mat-option>
-                        </mat-select>
-                  </mat-form-field>
+        <p class="instruction-text">
+          Elige el proyecto del cual deseas obtener el reporte.
+        </p>
 
-              <button   mat-raised-button   color="accent"   class="generate-button"
-                [disabled]="!selectedProject || isGenerating"   (click)="generateReport()">
+        <mat-form-field appearance="outline" class="project-selector">
+          <mat-label>Seleccionar Proyecto</mat-label>
+          <mat-icon matPrefix>topic</mat-icon>
+          <mat-select [(ngModel)]="selectedProject">
+            <mat-option *ngFor="let project of projects" [value]="project">
+              {{ project }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-                  <ng-container *ngIf="!isGenerating">
-                      <mat-icon>download</mat-icon>
-                      Generar Reporte
-                      </ng-container>
+        <button
+          mat-raised-button
+          color="accent"
+          class="generate-button"
+          [disabled]="!selectedProject || isGenerating"
+          (click)="generateProjectReport()"
+        >
+          <ng-container *ngIf="!isGenerating">
+            <mat-icon>download</mat-icon>
+            Generar Reporte de Proyecto
+          </ng-container>
 
-                  <ng-container *ngIf="isGenerating">
-                      <mat-progress-spinner mode="indeterminate" diameter="24"></mat-progress-spinner>
-                      <span>Generando...</span>
-                      </ng-container>
-                  </button>
-              </div>
-          </mat-card-content>
+          <ng-container *ngIf="isGenerating">
+            <mat-progress-spinner
+              mode="indeterminate"
+              diameter="24"
+            ></mat-progress-spinner>
+            <span>Generando...</span>
+          </ng-container>
+        </button>
+      </div>
+    </div>
+    <div *ngIf="reportType === 'meta'">
+      <div class="action-container">
+        <img
+          src="/assets/reporte.png"
+          alt="Ilustración de reporte"
+          class="report-illustration"
+        />
+
+        <p class="instruction-text">
+          Se generará un reporte global con todos los gastos de la base de datos,
+          separados en hojas de Excel por cada código de Meta.
+        </p>
+
+        <button
+          mat-raised-button
+          color="accent"
+          class="generate-button"
+          [disabled]="isGenerating"
+          (click)="generateMetaReport()"
+        >
+          <ng-container *ngIf="!isGenerating">
+            <mat-icon>download</mat-icon>
+            Generar Reporte por Meta
+          </ng-container>
+
+          <ng-container *ngIf="isGenerating">
+            <mat-progress-spinner
+              mode="indeterminate"
+              diameter="24"
+            ></mat-progress-spinner>
+            <span>Generando...</span>
+          </ng-container>
+        </button>
+      </div>
+    </div>
+    </mat-card-content>
 </mat-card>
