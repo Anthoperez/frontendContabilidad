@@ -1,4 +1,5 @@
-<h2 mat-dialog-title>Completar Datos del Reporte (Opcional)</h2>
+<section class="report-metadata-dialog">
+  <h2 mat-dialog-title>Completar Datos del Reporte (Opcional)</h2>
 <mat-dialog-content class="dialog-content"> <p>Puedes llenar esta información ahora, o dejarla en blanco para llenarla en el Excel.</p>
   
   <form [formGroup]="metadataForm" class="metadata-form">
@@ -38,24 +39,38 @@
 
       <div class="label-cell">PROCIENCIA</div>
       <mat-form-field appearance="outline">
-        <input matInput type="number" formControlName="presupuestoProcienciaAporteNoMonetario" placeholder="0.00">
+        <input matInput type="text" formControlName="presupuestoProcienciaAporteNoMonetario" 
+        (focus)="onCurrencyFocus($event)"
+        (blur)="onCurrencyBlur($event, 'presupuestoProcienciaAporteNoMonetario')"
+        placeholder="0.00">
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <input matInput type="number" formControlName="presupuestoProcienciaAporteMonetario" placeholder="0.00">
+        <input matInput type="text" formControlName="presupuestoProcienciaAporteMonetario" 
+        (focus)="onCurrencyFocus($event)"
+        (blur)="onCurrencyBlur($event, 'presupuestoProcienciaAporteMonetario')"
+        placeholder="0.00">
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <input matInput type="number" 
+        <input matInput type="number"
+
                [value]="(metadataForm.get('presupuestoProcienciaAporteNoMonetario')?.value || 0) + 
                         (metadataForm.get('presupuestoProcienciaAporteMonetario')?.value || 0)" 
-               readonly placeholder="0.00">
+               readonly placeholder="0.00"
+        >
       </mat-form-field>
 
       <div class="label-cell">Entidad Ejecutora</div>
       <mat-form-field appearance="outline">
-        <input matInput type="number" formControlName="presupuestoEntidadEjecutoraAporteNoMonetario" placeholder="0.00">
+        <input matInput type="text" formControlName="presupuestoEntidadEjecutoraAporteNoMonetario" 
+        (focus)="onCurrencyFocus($event)"
+        (blur)="onCurrencyBlur($event, 'presupuestoEntidadEjecutoraAporteNoMonetario')"
+        placeholder="0.00">
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <input matInput type="number" formControlName="presupuestoEntidadEjecutoraAporteMonetario" placeholder="0.00">
+        <input matInput type="text" formControlName="presupuestoEntidadEjecutoraAporteMonetario" 
+        (focus)="onCurrencyFocus($event)"
+        (blur)="onCurrencyBlur($event, 'presupuestoEntidadEjecutoraAporteMonetario')"
+        placeholder="0.00">
       </mat-form-field>
       <mat-form-field appearance="outline">
         <input matInput type="number" 
@@ -66,10 +81,16 @@
 
       <div class="label-cell">Entidad Asociada</div>
       <mat-form-field appearance="outline">
-        <input matInput type="number" formControlName="presupuestoEntidadAsociadaAporteNoMonetario" placeholder="0.00">
+        <input matInput type="text" formControlName="presupuestoEntidadAsociadaAporteNoMonetario" 
+        (focus)="onCurrencyFocus($event)"
+        (blur)="onCurrencyBlur($event, 'presupuestoEntidadAsociadaAporteNoMonetario')"
+        placeholder="0.00">
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <input matInput type="number" formControlName="presupuestoEntidadAsociadaAporteMonetario" placeholder="0.00">
+        <input matInput type="text" formControlName="presupuestoEntidadAsociadaAporteMonetario" 
+        (focus)="onCurrencyFocus($event)"
+        (blur)="onCurrencyBlur($event, 'presupuestoEntidadAsociadaAporteMonetario')"
+        placeholder="0.00">
       </mat-form-field>
       <mat-form-field appearance="outline">
         <input matInput type="number" 
@@ -90,7 +111,7 @@
 
         <mat-form-field appearance="outline" class="ingreso-monto">
           <mat-label>Monto</mat-label>
-          <input matInput type="number" formControlName="monto">
+          <input matInput type="text" formControlName="monto" >
         </mat-form-field>
 
         <button mat-icon-button color="warn" (click)="eliminarIngreso(i)" type="button">
@@ -149,3 +170,4 @@
   <button mat-raised-button color="accent" type="button" (click)="onGenerar()"> Generar Reporte con Datos
   </button>
 </mat-dialog-actions>
+</section>

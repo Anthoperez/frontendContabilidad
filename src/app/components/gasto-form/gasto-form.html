@@ -94,24 +94,33 @@
 
       <mat-form-field>
         <mat-label>F. Devengado SIAF</mat-label>
-        <input
-          matInput
-          [matDatepicker]="pickerDevengado"
-          formControlName="fechaDevengado"
-        />
-        <mat-datepicker-toggle
-          matSuffix
-          [for]="pickerDevengado"
-        ></mat-datepicker-toggle>
+        <input matInput [matDatepicker]="pickerDevengado" formControlName="fechaDevengado" />
+        <mat-datepicker-toggle matSuffix [for]="pickerDevengado"></mat-datepicker-toggle>
         <mat-datepicker #pickerDevengado></mat-datepicker>
         <mat-error>Campo requerido</mat-error>
       </mat-form-field>
 
-      <mat-form-field>
+      
+        <mat-form-field>
         <mat-label>PROYECTO</mat-label>
-        <input matInput formControlName="proyecto" />
+        <mat-select formControlName="proyecto">
+          <mat-option>
+            <ngx-mat-select-search 
+              [formControl]="proyectoFilterCtrl"
+              placeholderLabel="Buscar proyecto..."
+              noEntriesFoundLabel="'No se encontró ningún proyecto'">
+            </ngx-mat-select-search>
+          </mat-option>
+
+          <mat-optgroup *ngFor="let grupo of (filteredProyectosAgrupados | async)" [label]="grupo.seccion">
+            <mat-option *ngFor="let proyecto of grupo.proyectos" [value]="proyecto">
+              {{ proyecto }}
+            </mat-option>
+          </mat-optgroup>
+        </mat-select>
         <mat-error>Campo requerido</mat-error>
       </mat-form-field>
+      
 
       <mat-form-field>
         <mat-label>Meta</mat-label>

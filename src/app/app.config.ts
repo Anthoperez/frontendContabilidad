@@ -7,7 +7,7 @@ import { routes } from './app.routes';
 // ▼▼▼ AÑADIR ESTAS IMPORTACIONES ▼▼▼
 import { provideNativeDateAdapter } from '@angular/material/core';
 // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
-
+import { Injectable } from '@angular/core';
 // ▼▼▼ AÑADIR ESTAS IMPORTACIONES ▼▼▼
 import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { NativeDateAdapter } from '@angular/material/core';
@@ -25,6 +25,7 @@ registerLocaleData(localeEsPE);
  * Esto le dice a Angular Material CÓMO MOSTRAR la fecha en el input
  * Sobrescribimos el método 'format' para forzar 'DD/MM/YYYY'.
  */
+@Injectable()
 export class CustomDateAdapter extends NativeDateAdapter {
   override format(date: Date, displayFormat: object): string {
     // Forzar el formato DD/MM/YYYY

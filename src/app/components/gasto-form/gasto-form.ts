@@ -1,9 +1,12 @@
 // src/app/components/gasto-form/gasto-form.component.ts
-import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; // Importa FormGroup
+import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms'; // Importa FormGroup
 import { CommonModule } from '@angular/common';
 import { ApiService, Gasto } from '../../services/api';
 // ▼▼▼ AÑADIR ESTAS IMPORTACIONES ▼▼▼
+import { ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import {MatNativeDateModule } from '@angular/material/core';
 // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
@@ -21,18 +24,243 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatIconModule
+    MatSelectModule, MatButtonModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatIconModule, NgxMatSelectSearchModule
   ],
   templateUrl: './gasto-form.html',
   styleUrls: ['./gasto-form.css'],
 
 
 })
-export class GastoFormComponent {
+export class GastoFormComponent implements OnInit, OnDestroy {
   @Output() gastoCreado = new EventEmitter<void>();
   tiposDocumento = ['P/V', 'P/S', 'O/S', 'R.DGA', 'O/C']; //no es C/S es P/V
   fuentesFinanciamiento = ['D Y T', 'R.DET', 'R.D.R']; // no es R.D es R.D.R
   meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+  // ▼▼▼ AÑADIR ESTA ESTRUCTURA DE DATOS ▼▼▼
+  proyectosAgrupados = [
+    {
+      seccion: 'FONDECYT',
+      proyectos: [
+        'CONTRATO N° 04-2019-FONDECYT',
+        'CONTRATO N° 038-2021-FONDECYT',
+        'CONTRATO N° 041-2021-FONDECYT',
+        'CONTRATO N° 066-2021-FONDECYT',
+        'PROYECTO Nº 618506 - REMOVE', //preguntarrrr
+        'CONTRATO N° 501078609-2022-PROCIENCIA', //preguntarrrrrr
+        'CONTRATO N° 501083332-2023-PROCIENCIA',
+        'CONTRATO N° 501082885-2023-PROCIENCIA',
+        'CONTRATO N° 501082997-2023-PROCIENCIA',
+        'CONTRATO N° 501083008-2023-PROCIENCIA',
+        'CONTRATO N° 501085431-2023-PROCIENCIA-BM',
+        'CONTRATO N° 501085962-2023-PROCIENCIA-BM',
+        'CONTRATO N° 501086389-2024-PROCIENCIA',
+        'CONTRATO N° 501087339-2024-PROCIENCIA',
+        'CONTRATO N° 501086311-2024-PROCIENCIA'
+      ]
+    },
+    {
+      seccion: 'V CONVOCATORIA - 2021 MODALIDAD 1: PROYECTOS DE INVESTIGACIÓN BÁSICA Y APLICADA',
+      proyectos: [
+        'PIC 01-2021 MOD. 01 - V CONV.',
+        'PIC 02-2021 MOD. 01 - V CONV.',
+        'PIC 03-2021 MOD. 01 - V CONV.',
+        'PIC 04-2021 MOD. 01 - V CONV.',
+        'PIC 05-2021 MOD. 01 - V CONV.'
+      ]
+    },
+    {
+      seccion: 'V CONVOCATORIA - 2021 MODALIDAD 2: PROYECTOS DE INVESTIGACIÓN DE TESIS DE PREGRADO',
+      proyectos: [
+        'PIC 01-2021 MOD. 02 - V CONV.A',
+        'PIC 02-2021 MOD. 02 - V CONV.',
+        'PIC 03-2021 MOD. 02 - V CONV.',
+        'PIC 04-2021 MOD. 02 - V CONV.',
+        'PIC 05-2021 MOD. 02 - V CONV.',
+        'PIC 06-2021 MOD. 02 - V CONV.',
+    
+      ]
+    },
+
+    {
+      seccion: 'V CONVOCATORIA - 2021 MODALIDAD 3: PROYECTOS DE INVESTIGACIÓN DE TESIS DE POSGRADO',
+      proyectos: [
+        'PIC 01-2021 MOD. 03 - V CONV.',
+        'PIC 02-2021 MOD. 03 - V CONV.',
+        'PIC 03-2021 MOD. 03 - V CONV.',
+        'PIC 04-2021 MOD. 03 - V CONV.',
+        'PIC 05-2021 MOD. 03 - V CONV.',
+        'PIC 06-2021 MOD. 03 - V CONV.',
+        'PIC 07-2021 MOD. 03 - V CONV.',
+        'PIC 08-2021 MOD. 03 - V CONV.',
+        'PIC 09-2021 MOD. 03 - V CONV.',
+        'PIC 10-2021 MOD. 03 - V CONV.',
+        'PIC 11-2021 MOD. 03 - V CONV.',
+        'PIC 12-2021 MOD. 03 - V CONV.',
+        'PIC 13-2021 MOD. 03 - V CONV.',
+        'PIC 14-2021 MOD. 03 - V CONV.',
+        'PIC 15-2021 MOD. 03 - V CONV.',
+        
+      ]
+    },
+
+    {
+      seccion: 'V CONVOCATORIA - 2021 MODALIDAD 4: PROYECTOS DE PUBLICACIONES',
+      proyectos: [
+        'PIC 01-2021 MOD. 04 - V CONV.',
+        'PIC 02-2021 MOD. 04 - V CONV.',
+        'PIC 03-2021 MOD. 04 - V CONV.',
+        'PIC 04-2021 MOD. 04 - V CONV.',
+        'PIC 05-2021 MOD. 04 - V CONV.',
+        'PIC 06-2021 MOD. 04 - V CONV.',
+        'PIC 07-2021 MOD. 04 - V CONV.',
+        'PIC 08-2021 MOD. 04 - V CONV.',
+        'PIC 09-2021 MOD. 04 - V CONV.',
+        'PIC 10-2021 MOD. 04 - V CONV.',
+        'PIC 11-2021 MOD. 04 - V CONV.',
+        'PIC 12-2021 MOD. 04 - V CONV.',
+        'PIC 13-2021 MOD. 04 - V CONV.',
+        'PIC 14-2021 MOD. 04 - V CONV.',
+        'PIC 15-2021 MOD. 04 - V CONV.',
+        'PIC 16-2021 MOD. 04 - V CONV.',
+        'PIC 17-2021 MOD. 04 - V CONV.',
+        'PIC 18-2021 MOD. 04 - V CONV.',
+        'PIC 19-2021 MOD. 04 - V CONV.',
+        'PIC 20-2021 MOD. 04 - V CONV.',
+        'PIC 21-2021 MOD. 04 - V CONV.',
+        'PIC 22-2021 MOD. 04 - V CONV.',
+      ]
+    },
+
+
+    {
+      seccion: 'V CONVOCATORIA - 2021 MODALIDAD MODALIDAD 4-II: PROYECTOS DE INVESTIGACIÓN PUBLICACIONES (LIBROS)',
+      proyectos: [
+        'PIC 23-2021 MOD. 04-II - V CONV.',
+        'PIC 24-2021 MOD. 04-II - V CONV.'
+      ]
+    },
+
+
+    {
+      seccion: 'VI CONVOCATORIA - 2022 MODALIDAD 1: PROYECTOS DE INVESTIGACIÓN APLICADA',
+      proyectos: [
+        'PIC 01-2022 MOD. 01 - VI CONV.',
+        'PIC 02-2022 MOD. 01 - VI CONV.',
+        'PIC 03-2022 MOD. 01 - VI CONV.',
+        'PIC 04-2022 MOD. 01 - VI CONV.'
+
+      ]
+    },
+
+
+    {
+      seccion: 'VI CONVOCATORIA - 2022 MODALIDAD 2: CATEGORIAS CONSOLIDADO Y POR CONSOLIDAR',
+      
+      proyectos: [
+        'PIC 01-2022 MOD. 02 - VI CONV.',
+        'PIC 02-2022 MOD. 02 - VI CONV.',
+      ]
+    },
+
+    {
+      seccion: 'VI CONVOCATORIA - 2022 MODALIDAD 2: CATEGORIA EMERGENTE',
+      proyectos: [
+        'PIC 03-2022 MOD. 02 - VI CONV.',
+        'PIC 04-2022 MOD. 02 - VI CONV.',
+    
+      ]
+    },
+
+    {
+      seccion: 'VI CONVOCATORIA - 2022 MODALIDAD: PROYECTOS EMBLEMATICO',
+      proyectos: [
+        'PIC 01-2023 - EMBLEMATICO',
+        'PIC 02-2023 - EMBLEMATICO',
+        'PIC 03-2023 -EMBLEMATICO ',
+        
+      ]
+    },
+
+    {
+      seccion: 'VII CONVOCATORIA - 2023 MODALIDAD: 01 - PROY. INVESTIGACION CIENTIFICA',
+      proyectos: [
+        'PIC 01-2023 MOD. 01 - VII CONV.',
+        'PIC 02-2023 MOD. 01 - VII CONV.',
+        'PIC 03-2023 MOD. 01 - VII CONV.',
+        'PIC 04-2023 MOD. 01 - VII CONV.',
+        'PIC 05-2023 MOD. 01 - VII CONV.',
+        'PIC 06-2023 MOD. 01 - VII CONV.',
+        'PIC 07-2023 MOD. 01 - VII CONV.',
+        'PIC 08-2023 MOD. 01 - VII CONV.'
+      ]
+    },
+
+    {
+      seccion: 'VII CONVOCATORIA - 2023 MODALIDAD: 02 - EN CIENCIAS SOCIALES',
+      proyectos: [
+        'PIC 01-2023 MOD. 02 - VII CONV.',
+        'PIC 02-2023 MOD. 02 - VII CONV.',
+      ]
+    },
+
+    {
+      seccion: 'VII CONVOCATORIA - 2023 MODALIDAD: 03 - PROY. INVESTIGACION EMBLEMATICA',
+      proyectos: [
+        'PIC 01-2023 MOD. 03 - VII CONV.',
+        'PIC 02-2023 MOD. 03 - VII CONV.',
+        'PIC 03-2023 MOD. 03 - VII CONV.',
+        'PIC 04-2023 MOD. 03 - VII CONV.',
+        'PIC 05-2023 MOD. 03 - VII CONV.',
+        'PIC 06-2023 MOD. 03 - VII CONV.',
+        'PIC 07-2023 MOD. 03 - VII CONV.',
+
+      ]
+    },
+
+    {
+      seccion: 'VIII CONVOCATORIA - 2024 MODALIDAD: 01 - PROY. INVESTIGACION CIENTIFICA',
+      proyectos: [
+        'PIC 01-2024 MOD. 01 - VIII CONV.',
+        'PIC 02-2024 MOD. 01 - VIII CONV.',
+      ]
+    },
+
+    {
+      seccion: 'VIII CONVOCATORIA - 2024 MODALIDAD: 02 - PROY. INVESTIGACION CIENTIFICA',
+      proyectos: [
+        'PIC 01-2024 MOD. 02 - VIII CONV.',
+        'PIC 02-2024 MOD. 02 - VIII CONV.',
+        'PIC 03-2024 MOD. 02 - VIII CONV.',
+        'PIC 04-2024 MOD. 02 - VIII CONV.',
+        'PIC 05-2024 MOD. 02 - VIII CONV.',
+        'PIC 06-2024 MOD. 02 - VIII CONV.',
+        'PIC 07-2024 MOD. 02 - VIII CONV.',
+        'PIC 08-2024 MOD. 02 - VIII CONV.',
+        'PIC 09-2024 MOD. 02 - VIII CONV.',
+        'PIC 10-2024 MOD. 02 - VIII CONV.',
+        'PIC 11-2024 MOD. 02 - VIII CONV.',
+        'PIC 12-2024 MOD. 02 - VIII CONV.',
+        'PIC 13-2024 MOD. 02 - VIII CONV.',
+        'PIC 14-2024 MOD. 02 - VIII CONV.',
+        'PIC 15-2024 MOD. 02 - VIII CONV.',
+        'PIC 16-2024 MOD. 02 - VIII CONV.',
+        'PIC 17-2024 MOD. 02 - VIII CONV.'
+      ]
+    },
+
+
+    {
+      seccion: 'VIII CONVOCATORIA - 2024 MODALIDAD: 03 - PROY. INVESTIGACION CIENTIFICA',
+      proyectos: [
+        'PIC 01-2024 MOD. 03 - VIII CONV.',
+        'PIC 02-2024 MOD. 03 - VIII CONV.',
+        'PIC 03-2024 MOD. 03 - VIII CONV.',
+        'PIC 04-2024 MOD. 03 - VIII CONV.',
+      ]
+    },
+  ];
+  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
 
   // 1. Declaramos la propiedad del formulario aquí
   gastoForm: FormGroup;
@@ -43,6 +271,19 @@ export class GastoFormComponent {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
+  // ▼▼▼ 3. AÑADIR ESTAS PROPIEDADES PARA EL FILTRO ▼▼▼
+  
+  /** Control para el campo de búsqueda de proyectos */
+  public proyectoFilterCtrl: FormControl = new FormControl('');
+
+  /** Lista de proyectos filtrados (se actualiza en tiempo real) */
+  public filteredProyectosAgrupados: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
+
+  /** Subject para manejar la des-suscripción */
+  private _onDestroy = new Subject<void>();
+  
   // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
 
@@ -73,6 +314,63 @@ export class GastoFormComponent {
       fechaRetorno: [null as Date | null],
     });
   }
+
+
+  // ▼▼▼ 4. AÑADIR ngOnInit Y ngOnDestroy ▼▼▼
+
+  ngOnInit() {
+    // Carga la lista inicial de proyectos en el filtro
+    this.filteredProyectosAgrupados.next(this.proyectosAgrupados.slice());
+
+    // Escucha los cambios en el campo de búsqueda
+    this.proyectoFilterCtrl.valueChanges
+      .pipe(takeUntil(this._onDestroy))
+      .subscribe(() => {
+        this.filterProyectos();
+      });
+  }
+
+  ngOnDestroy() {
+    this._onDestroy.next();
+    this._onDestroy.complete();
+  }
+
+  // ▼▼▼ 5. AÑADIR EL MÉTODO DE FILTRADO ▼▼▼
+  
+  private filterProyectos() {
+    if (!this.proyectosAgrupados) {
+      return;
+    }
+    // Obtiene el valor de búsqueda
+    let search = this.proyectoFilterCtrl.value;
+    if (!search) {
+      // Si no hay búsqueda, muestra la lista completa
+      this.filteredProyectosAgrupados.next(this.proyectosAgrupados.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+
+    // Filtra la lista
+    this.filteredProyectosAgrupados.next(
+      this.proyectosAgrupados.map(grupo => {
+        // Filtra los proyectos *dentro* de cada grupo
+        const filteredProyectos = grupo.proyectos.filter(proyecto => 
+          proyecto.toLowerCase().includes(search)
+        );
+        
+        if (filteredProyectos.length > 0) {
+          // Si el grupo tiene resultados, devuelve un *nuevo* objeto de grupo
+          return {
+            seccion: grupo.seccion,
+            proyectos: filteredProyectos
+          };
+        }
+        return null; // Si el grupo no tiene resultados, se descarta
+      }).filter(grupo => grupo !== null) // Limpia los grupos nulos
+    );
+  }
+
 
   onSubmit(): void {
     if (this.gastoForm.invalid) {

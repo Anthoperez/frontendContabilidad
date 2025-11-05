@@ -44,46 +44,46 @@ export interface ReportMetadata {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:3000/api';
+    private apiUrl = 'http://localhost:3000/api';
 
-  constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) { }
 
-  // --- MÉTODOS EXISTENTES (sin cambios) ---
-  getGastos(): Observable<Gasto[]> {
-    return this.http.get<Gasto[]>(`${this.apiUrl}/gastos`);
-  }
+    // --- MÉTODOS EXISTENTES (sin cambios) ---
+    getGastos(): Observable<Gasto[]> {
+      return this.http.get<Gasto[]>(`${this.apiUrl}/gastos`);
+    }
 
-  crearGasto(gasto: Partial<Gasto>): Observable<Gasto> {
-    return this.http.post<Gasto>(`${this.apiUrl}/gastos`, gasto);
-  }
+    crearGasto(gasto: Partial<Gasto>): Observable<Gasto> {
+      return this.http.post<Gasto>(`${this.apiUrl}/gastos`, gasto);
+    }
 
-  importarGastos(gastos: Partial<Gasto>[]): Observable<any> {
-    return this.http.post(`${this.apiUrl}/gastos/import`, gastos);
-  }
+    importarGastos(gastos: Partial<Gasto>[]): Observable<any> {
+      return this.http.post(`${this.apiUrl}/gastos/import`, gastos);
+    }
 
-  getProjects(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/projects`);
-  }
+    getProjects(): Observable<string[]> {
+      return this.http.get<string[]>(`${this.apiUrl}/projects`);
+    }
 
-  // --- MÉTODO MODIFICADO: DESCARGAR REPORTE ---
-  // ▼▼▼ MODIFICACIÓN AQUÍ ▼▼▼
-  downloadReport(
-    projectName: string,
-    metadata: ReportMetadata,
-  ): Observable<Blob> {
-    // Creamos el cuerpo de la solicitud
-    const body = {
-      projectName: projectName,
-      metadata: metadata,
-    };
+    // --- MÉTODO MODIFICADO: DESCARGAR REPORTE ---
+    // ▼▼▼ MODIFICACIÓN AQUÍ ▼▼▼
+    downloadReport(
+      projectName: string,
+      metadata: ReportMetadata,
+    ): Observable<Blob> {
+      // Creamos el cuerpo de la solicitud
+      const body = {
+        projectName: projectName,
+        metadata: metadata,
+      };
 
-    
+      
 
-    // Cambiamos de GET a POST y enviamos el 'body'
-    return this.http.post(`${this.apiUrl}/reports/generate`, body, {
-      responseType: 'blob', // ¡Esto sigue siendo muy importante!
-    });
-  }
+      // Cambiamos de GET a POST y enviamos el 'body'
+      return this.http.post(`${this.apiUrl}/reports/generate`, body, {
+        responseType: 'blob', // ¡Esto sigue siendo muy importante!
+      });
+    }
   // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
   // ▼▼▼ AÑADIR ESTE NUEVO MÉTODO ▼▼▼

@@ -6,7 +6,6 @@
   border-radius: 8px;
   background-color: #fff;
   padding: 10px;
-
 }
 
 table {
@@ -31,7 +30,7 @@ table {
 }
 
 th.mat-header-cell, td.mat-cell {
-  padding: 0 10px;
+  padding: 0 8px;
   white-space: nowrap; /* Evita que el texto se divida en varias líneas */
   text-overflow: ellipsis; /* Añade "..." si el texto es demasiado largo */
   overflow: hidden; /* Oculta el desbordamiento */

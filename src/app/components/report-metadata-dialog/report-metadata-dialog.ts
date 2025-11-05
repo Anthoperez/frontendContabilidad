@@ -30,6 +30,14 @@ import { MatNativeDateModule } from '@angular/material/core'; // Importar si no 
 export class ReportMetadataDialogComponent implements OnInit { // Implementar OnInit
   metadataForm: FormGroup;
 
+   // ▼▼▼ AÑADIR ESTE FORMATEADOR DE MONEDA ▼▼▼
+  private formatter = new Intl.NumberFormat('es-PE', {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
   constructor(
     public dialogRef: MatDialogRef<ReportMetadataDialogComponent>,
     private fb: FormBuilder,
@@ -65,6 +73,8 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     });
   }
 
+
+  
   ngOnInit(): void {
     // Para asegurarnos de que haya al menos una fila de ingreso al iniciar
     if (this.ingresos.length === 0) {
@@ -130,4 +140,44 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
   onOmitir(): void {
     this.dialogRef.close({}); 
   }
+
+  /**
+   * Al entrar (focus) a un campo de moneda, muestra el número simple.
+   * Ej: "23,500.00" -> "23500.00"
+   */
+  onCurrencyFocus(event: FocusEvent): void {
+    const input = event.target as HTMLInputElement;
+    const controlName = input.getAttribute('formControlName') as 'presupuestoProcienciaAporteNoMonetario' | 'presupuestoProcienciaAporteMonetario' | 'presupuestoEntidadEjecutoraAporteNoMonetario' | 'presupuestoEntidadEjecutoraAporteMonetario' | 'presupuestoEntidadAsociadaAporteNoMonetario' | 'presupuestoEntidadAsociadaAporteMonetario' | 'monto';
+    const control = this.metadataForm.get(controlName);
+    
+    if (control && control.value !== null) {
+      input.value = Number(control.value).toFixed(2);
+    }
+  }
+
+  /**
+   * Al salir (blur) de un campo de moneda:
+   * 1. Parsea el valor (ej: "23,500.5" o "23500.5") a un número.
+   * 2. Guarda el número limpio en el form control.
+   * 3. Muestra el valor formateado en el input (ej: "23,500.50").
+   */
+  onCurrencyBlur(event: FocusEvent, controlName: 'presupuestoProcienciaAporteNoMonetario' | 'presupuestoProcienciaAporteMonetario' | 'presupuestoEntidadEjecutoraAporteNoMonetario' | 'presupuestoEntidadEjecutoraAporteMonetario' | 'presupuestoEntidadAsociadaAporteNoMonetario' | 'presupuestoEntidadAsociadaAporteMonetario' | 'monto' ): void {
+    const input = event.target as HTMLInputElement;
+    const control = this.metadataForm.get(controlName);
+
+    if (control) {
+      const rawValue = input.value.replace(/,/g, ''); // Quita comas
+      const numValue = parseFloat(rawValue);
+
+      if (!isNaN(numValue)) {
+        control.setValue(numValue); // Guarda el número
+        input.value = this.formatter.format(numValue); // Muestra formateado
+      } else {
+        control.setValue(null); // Borra si no es un número
+        input.value = '';
+      }
+    }
+  }
+
+  
 }

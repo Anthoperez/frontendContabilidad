@@ -1,4 +1,9 @@
 /* src/app/components/report-metadata-dialog/report-metadata-dialog.css */
+
+.report-metadata-dialog {
+  width: 100%; /* Ancho fijo para el diálogo */
+}
+
 .dialog-content {
   max-height: 80vh; /* Permite scroll si el contenido es muy largo */
   overflow-y: auto; /* Habilita el scroll vertical */

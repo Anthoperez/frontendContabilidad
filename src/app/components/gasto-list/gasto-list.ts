@@ -1,11 +1,12 @@
 // src/app/components/gasto-list/gasto-list.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService, Gasto } from '../../services/api';
 
 // Importaciones de Angular Material
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
+
 
 @Component({
   selector: 'app-gasto-list',
@@ -35,4 +36,5 @@ export class GastoListComponent implements OnInit {
       this.gastos = data;
     });
   }
+
 }
