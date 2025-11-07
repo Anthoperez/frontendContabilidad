@@ -5,6 +5,9 @@ import { provideHttpClient } from '@angular/common/http'; // Para la API
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'; // Para Material
 import { routes } from './app.routes';
 // ▼▼▼ AÑADIR ESTAS IMPORTACIONES ▼▼▼
+// ▼▼▼ AÑADIR/MODIFICAR ESTAS IMPORTACIONES ▼▼▼
+import { MAT_DATE_FORMATS, MAT_NATIVE_DATE_FORMATS } from '@angular/material/core';
+// ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 import { provideNativeDateAdapter } from '@angular/material/core';
 // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 import { Injectable } from '@angular/core';
@@ -55,10 +58,19 @@ export const appConfig: ApplicationConfig = {
     { provide: MAT_DATE_LOCALE, useValue: 'es-PE' },
     
     // 5. Proveer nuestro adaptador personalizado (para el input)
-    { provide: DateAdapter, useClass: CustomDateAdapter }
+    { provide: DateAdapter, useClass: CustomDateAdapter },
     
     // Ya no necesitamos provideNativeDateAdapter()
     
     // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
+    // 6. ▼▼▼ AÑADIR ESTE PROVEEDOR QUE FALTA ▼▼▼
+    // Esto es necesario para que el componente <mat-datepicker> sepa CÓMO
+    // renderizar el calendario (los formatos nativos DD/MM/YYYY).
+    // El error "No provider found for MAT_DATE_FORMATS" se debe a que esto falta.
+    { provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS }
+    // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
+
   ]
 };

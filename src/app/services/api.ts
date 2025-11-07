@@ -33,6 +33,7 @@ export interface ReportMetadata {
   rr_investigador?: string;
   fechaInicio?: Date | null;
   duracion?: string;
+  fechaCulminacion?: Date;
   ingresos?: {
   descripcion: string;
   monto: number;

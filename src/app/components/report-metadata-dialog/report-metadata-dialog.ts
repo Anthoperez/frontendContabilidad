@@ -1,8 +1,8 @@
 // src/app/components/report-metadata-dialog/report-metadata-dialog.ts
-import { Component, OnInit } from '@angular/core'; // Añadir OnInit
+import { Component, Inject, OnInit } from '@angular/core'; // Añadir OnInit
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms'; // Añadir Validators
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,12 +41,14 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
   constructor(
     public dialogRef: MatDialogRef<ReportMetadataDialogComponent>,
     private fb: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) public data: any, // Datos opcionales si se pasan
   ) {
     this.metadataForm = this.fb.group({
       investigador: [''],
       rr_investigador: [''], // Para la "R.R. Nº..."
       fechaInicio: [null as Date | null],
       duracion: [''],
+      fechaCulminacion: [null],
       
       // ▼▼▼ NUEVOS CAMPOS PARA DESCRIPCION DE PRESUPUESTO ▼▼▼
       presupuestoProcienciaAporteMonetario: [null as number | null],
@@ -77,6 +79,24 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
   
   ngOnInit(): void {
     // Para asegurarnos de que haya al menos una fila de ingreso al iniciar
+
+    if(this.data && this.data.metadata) {
+      this.metadataForm.patchValue(this.data.metadata);
+      if(this.data.metadata.ingresos){
+        this.data.metadata.ingresos.forEach((ingreso: any) => {
+          this.nuevoIngreso();
+          const lastIndex = this.ingresos.length - 1;
+          const ingresoGroup = this.ingresos.at(lastIndex);
+          ingresoGroup.patchValue({
+            descripcion: ingreso.descripcion,
+            monto: ingreso.monto
+          });
+        });
+      }
+    }else{
+      this.ingresos;
+    }
+
     if (this.ingresos.length === 0) {
       this.nuevoIngreso();
     }

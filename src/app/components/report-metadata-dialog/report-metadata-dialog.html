@@ -23,6 +23,20 @@
         <mat-datepicker #pickerInicio></mat-datepicker>
       </mat-form-field>
 
+      <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Fecha de Culminación</mat-label>
+      <input
+        matInput
+        [matDatepicker]="pickerCulminacion"
+        formControlName="fechaCulminacion"
+      />
+      <mat-datepicker-toggle
+        matSuffix
+        [for]="pickerCulminacion"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #pickerCulminacion></mat-datepicker>
+    </mat-form-field>
+    
       <mat-form-field appearance="outline">
         <mat-label>Duración (Ej: 18 meses)</mat-label>
         <input matInput formControlName="duracion">
