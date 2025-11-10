@@ -38,14 +38,21 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
   styleUrls: ['./report-generator.css']
 })
 export class ReportGeneratorComponent implements OnInit {
-  projects: string[] = [];
-  selectedProject: string = '';
-  isLoading = false;
-  isGenerating = false; // <-- CORREGIDO (estaba como 'unknown')
-
-  // ▼▼▼ AÑADIR ESTA PROPIEDAD ▼▼▼
-  reportType: 'project' | 'meta' = 'project'; // Controla qué UI se muestra
-  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+ 
+  // --- PROPIEDADES MODIFICADAS ---
+  contratoProjects: string[] = []; // Lista para Contratos
+  picProjects: string[] = [];      // NUEVA: Lista para PICs
+  
+  selectedContratoProject: string = ''; // Específico para Contrato
+  selectedPicProject: string = '';      // NUEVO: Específico para PIC
+  
+  isLoadingContratos = false; // Específico
+  isLoadingPics = false;      // NUEVO
+  isGenerating = false;
+  
+  // Tipo de reporte ahora tiene 3 estados
+  reportType: 'contrato' | 'pic' | 'meta' = 'contrato'; 
+  // --- FIN DE PROPIEDADES MODIFICADAS ---
 
 
   // ▼▼▼ INYECTAR 'MatDialog' ▼▼▼
@@ -57,96 +64,125 @@ export class ReportGeneratorComponent implements OnInit {
   // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
   ngOnInit(): void {
-    this.loadProjects();
+    // Cargamos ambas listas de proyectos al iniciar
+    this.loadContratoProjects();
+    this.loadPicProjects();
   }
 
-  loadProjects(): void {
-    this.isLoading = true;
-    this.apiService.getProjects().subscribe({
+// --- MÉTODOS DE CARGA SEPARADOS ---
+  loadContratoProjects(): void {
+    this.isLoadingContratos = true;
+    this.apiService.getContratoProjects().subscribe({
       next: (data) => {
-        this.projects = data;
-        this.isLoading = false;
+        this.contratoProjects = data;
+        this.isLoadingContratos = false;
       },
       error: () => {
-        this.isLoading = false;
-        this.showError('No se pudo cargar la lista de proyectos.');
+        this.isLoadingContratos = false;
+        this.showError('No se pudo cargar la lista de Contratos.');
       }
     });
-  }
+  }
 
-  // ▼▼▼ MÉTODO 'generateReport' COMPLETAMENTE MODIFICADO ▼▼▼
-  generateProjectReport(): void {
-    if (!this.selectedProject) {
-      this.showError('Por favor, selecciona un proyecto.');
-      return;
-    }
+  loadPicProjects(): void {
+    this.isLoadingPics = true;
+    this.apiService.getPicProjects().subscribe({
+      next: (data) => {
+        this.picProjects = data;
+        this.isLoadingPics = false;
+      },
+      error: () => {
+        this.isLoadingPics = false;
+        this.showError('No se pudo cargar la lista de Proyectos PIC.');
+      }
+    });
+  }
+  // --- FIN DE MÉTODOS DE CARGA ---
 
-    // 1. Abrir el diálogo
+  
+/**
+   * Genera el reporte para CONTRATO
+   */
+  generateContratoReport(): void {
+    if (!this.selectedContratoProject) {
+      this.showError('Por favor, selecciona un proyecto de Contrato.');
+      return;
+    }
+
     const dialogRef = this.dialog.open(ReportMetadataDialogComponent, {
       width: '600px',
-      disableClose: true, // Evita que se cierre al hacer clic fuera
+      disableClose: true,
     });
 
-    // 2. Escuchar a cuando se cierre el diálogo
     dialogRef.afterClosed().subscribe((metadata: ReportMetadata | undefined) => {
-      
-      // Si el usuario presionó "Cancelar", metadata será 'undefined'
       if (metadata === undefined) {
-        return; 
+        return; // Usuario canceló
       }
       
-      // Si el usuario presionó "Omitir" o "Generar", 'metadata' será un objeto
-      // (vacío si omitió, con datos si llenó)
       this.isGenerating = true;
-
-      // 3. Llamar a la API con el projectName y los metadatos
-      this.apiService.downloadReport(this.selectedProject, metadata).subscribe({
+      // Llama al endpoint específico de CONTRATO
+      this.apiService.downloadContratoReport(this.selectedContratoProject, metadata).subscribe({
         next: (blob) => {
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          const safeProjectName = this.selectedProject.replace(/[^a-z0-9]/gi, '_');
-          a.download = `Reporte_${safeProjectName}.xlsx`;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          a.remove();
-          
+          this.downloadFile(blob, `Reporte_Contrato_${this.selectedContratoProject.replace(/[^a-z0-9]/gi, '_')}.xlsx`);
           this.isGenerating = false;
-          this.showSuccess('¡Reporte generado y descargado!');
         },
         error: (err) => {
           this.isGenerating = false;
-          this.showError('Ocurrió un error al generar el reporte.');
+          this.showError('Ocurrió un error al generar el reporte de Contrato.');
           console.error('Error al descargar:', err);
         }
       });
     });
-  }
-  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+  }
 
-
-  // ▼▼▼ AÑADIR ESTE NUEVO MÉTODO (traído de report-meta.ts) ▼▼▼
   /**
+   * NUEVO: Genera el reporte para PIC
+   */
+  generatePicReport(): void {
+    if (!this.selectedPicProject) {
+      this.showError('Por favor, selecciona un proyecto PIC.');
+      return;
+    }
+
+    // Los reportes PIC también pueden tener metadatos (aunque no los usen todos)
+    // Usamos el mismo diálogo para mantener la Opción A (dejar en blanco) o C (usar global)
+    const dialogRef = this.dialog.open(ReportMetadataDialogComponent, {
+      width: '600px',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((metadata: ReportMetadata | undefined) => {
+      if (metadata === undefined) {
+        return; // Usuario canceló
+      }
+      
+      this.isGenerating = true;
+      // Llama al endpoint específico de PIC
+      this.apiService.downloadPicReport(this.selectedPicProject, metadata).subscribe({
+        next: (blob) => {
+          this.downloadFile(blob, `Reporte_PIC_${this.selectedPicProject.replace(/[^a-z0-9]/gi, '_')}.xlsx`);
+          this.isGenerating = false;
+        },
+        error: (err) => {
+          this.isGenerating = false;
+          this.showError('Ocurrió un error al generar el reporte PIC.');
+          console.error('Error al descargar:', err);
+        }
+      });
+    });
+  }
+
+
+/**
+   * (Sin cambios)
    * Genera el reporte global agrupado por Meta
    */
   generateMetaReport(): void {
     this.isGenerating = true;
-
     this.apiService.downloadReportByMeta().subscribe({
       next: (blob) => {
-        // Lógica para descargar el archivo
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Reporte_Global_por_Meta.xlsx`; // Nombre fijo
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
-
+        this.downloadFile(blob, 'Reporte_Global_por_Meta.xlsx');
         this.isGenerating = false;
-        this.showSuccess('¡Reporte por Meta generado y descargado!');
       },
       error: (err) => {
         this.isGenerating = false;
@@ -155,8 +191,20 @@ export class ReportGeneratorComponent implements OnInit {
       },
     });
   }
-  // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+  // --- FIN DE MÉTODOS DE GENERACIÓN ---
 
+  // --- Helpers (sin cambios) ---
+  private downloadFile(blob: Blob, fileName: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+    this.showSuccess('¡Reporte generado y descargado!');
+  }
 
   
   private showError(message: string): void {

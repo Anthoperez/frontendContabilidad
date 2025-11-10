@@ -13,26 +13,27 @@
       class="report-toggle-group"
       aria-label="Tipo de Reporte"
     >
-      <mat-button-toggle value="project">Por Proyecto</mat-button-toggle>
+      <mat-button-toggle value="contrato">Por Contrato</mat-button-toggle>
+      <mat-button-toggle value="pic">Por PIC</mat-button-toggle>
       <mat-button-toggle value="meta">Por Meta (Global)</mat-button-toggle>
     </mat-button-toggle-group>
-    <div *ngIf="reportType === 'project'">
-      <div *ngIf="isLoading" class="state-container">
+    <div *ngIf="reportType === 'contrato'">
+      <div *ngIf="isLoadingContratos" class="state-container">
         <mat-spinner diameter="50"></mat-spinner>
-        <p>Cargando proyectos...</p>
+        <p>Cargando contratos...</p>
       </div>
 
       <div
-        *ngIf="!isLoading && projects.length === 0"
+        *ngIf="!isLoadingContratos && contratoProjects.length === 0"
         class="state-container empty-state"
       >
         <mat-icon class="empty-icon">folder_off</mat-icon>
-        <h3>No hay proyectos disponibles</h3>
-        <p>Cuando agregues gastos a un nuevo proyecto, aparecerá aquí.</p>
+        <h3>No hay Contratos disponibles</h3>
+        <p>Agregue gastos a un proyecto de Contrato para que aparezca aquí.</p>
       </div>
 
       <div
-        *ngIf="!isLoading && projects.length > 0"
+        *ngIf="!isLoadingContratos && contratoProjects.length > 0"
         class="action-container"
       >
         <img
@@ -42,14 +43,14 @@
         />
 
         <p class="instruction-text">
-          Elige el proyecto del cual deseas obtener el reporte.
+          Elige el Contrato del cual deseas obtener el reporte.
         </p>
 
         <mat-form-field appearance="outline" class="project-selector">
-          <mat-label>Seleccionar Proyecto</mat-label>
+          <mat-label>Seleccionar Contrato</mat-label>
           <mat-icon matPrefix>topic</mat-icon>
-          <mat-select [(ngModel)]="selectedProject">
-            <mat-option *ngFor="let project of projects" [value]="project">
+          <mat-select [(ngModel)]="selectedContratoProject">
+            <mat-option *ngFor="let project of contratoProjects" [value]="project">
               {{ project }}
             </mat-option>
           </mat-select>
@@ -59,12 +60,12 @@
           mat-raised-button
           color="accent"
           class="generate-button"
-          [disabled]="!selectedProject || isGenerating"
-          (click)="generateProjectReport()"
+          [disabled]="!selectedContratoProject || isGenerating"
+          (click)="generateContratoReport()"
         >
           <ng-container *ngIf="!isGenerating">
             <mat-icon>download</mat-icon>
-            Generar Reporte de Proyecto
+            Generar Reporte de Contrato
           </ng-container>
 
           <ng-container *ngIf="isGenerating">
@@ -77,6 +78,66 @@
         </button>
       </div>
     </div>
+    
+
+    <div *ngIf="reportType === 'pic'">
+      <div *ngIf="isLoadingPics" class="state-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando Proyectos PIC...</p>
+      </div>
+
+      <div
+        *ngIf="!isLoadingPics && picProjects.length === 0"
+        class="state-container empty-state"
+      >
+        <mat-icon class="empty-icon">folder_off</mat-icon>
+        <h3>No hay PICs disponibles</h3>
+        <p>Agregue gastos a un proyecto PIC para que aparezca aquí.</p>
+      </div>
+
+      <div
+        *ngIf="!isLoadingPics && picProjects.length > 0"
+        class="action-container"
+      >
+        <img src="/assets/reporte.png" alt="Reporte" class="report-illustration" />
+        <p class="instruction-text">
+          Elige el grupo de PICs del cual deseas obtener el reporte.
+          <br>
+          <small>(Selecciona cualquier PIC de la Modalidad/Convocatoria)</small>
+        </p>
+
+        <mat-form-field appearance="outline" class="project-selector">
+          <mat-label>Seleccionar Proyecto PIC</mat-label>
+          <mat-icon matPrefix>topic</mat-icon>
+          <mat-select [(ngModel)]="selectedPicProject">
+            <mat-option *ngFor="let project of picProjects" [value]="project">
+              {{ project }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="accent"
+          class="generate-button"
+          [disabled]="!selectedPicProject || isGenerating"
+          (click)="generatePicReport()"
+        >
+          <ng-container *ngIf="!isGenerating">
+            <mat-icon>download</mat-icon>
+            Generar Reporte PIC
+          </ng-container>
+          <ng-container *ngIf="isGenerating">
+            <mat-progress-spinner mode="indeterminate" diameter="24"></mat-progress-spinner>
+            <span>Generando...</span>
+          </ng-container>
+        </button>
+      </div>
+    </div>
+    
+
+
+
     <div *ngIf="reportType === 'meta'">
       <div class="action-container">
         <img

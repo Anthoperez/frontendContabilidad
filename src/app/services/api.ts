@@ -38,6 +38,25 @@ export interface ReportMetadata {
   descripcion: string;
   monto: number;
   }[];
+
+  // (Añade los otros campos si los tienes, como presupuesto, etc.)
+  presupuestoProcienciaAporteMonetario?: number | null;
+  presupuestoProcienciaAporteNoMonetario?: number | null;
+  presupuestoEntidadEjecutoraAporteMonetario?: number | null;
+  presupuestoEntidadEjecutoraAporteNoMonetario?: number | null;
+  presupuestoEntidadAsociadaAporteMonetario?: number | null;
+  presupuestoEntidadAsociadaAporteNoMonetario?: number | null;
+  gastosAnoAnterior?: {
+    year: number;
+    bienesCorrientes: number | null;
+    bienesCapital: number | null;
+    servicios: number | null;
+    subvencion: number | null;
+    viaticos: number | null;
+    encargoInterno: number | null;
+  };
+
+
 }
 // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
@@ -62,13 +81,33 @@ export class ApiService {
       return this.http.post(`${this.apiUrl}/gastos/import`, gastos);
     }
 
-    getProjects(): Observable<string[]> {
-      return this.http.get<string[]>(`${this.apiUrl}/projects`);
-    }
+    // --- MÉTODOS DE PROYECTOS (MODIFICADOS) ---
+  
+  /**
+   * (Obsoleto, pero lo dejamos)
+   * Obtiene TODOS los proyectos
+   */
+  getProjects(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/projects`);
+  }
+
+  /**
+   * NUEVO: Obtiene solo proyectos CONTRATO
+   */
+  getContratoProjects(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/projects/contrato`);
+  }
+
+  /**
+   * NUEVO: Obtiene solo proyectos PIC
+   */
+  getPicProjects(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/projects/pic`);
+  }
 
     // --- MÉTODO MODIFICADO: DESCARGAR REPORTE ---
     // ▼▼▼ MODIFICACIÓN AQUÍ ▼▼▼
-    downloadReport(
+    downloadContratoReport(
       projectName: string,
       metadata: ReportMetadata,
     ): Observable<Blob> {
@@ -81,11 +120,30 @@ export class ApiService {
       
 
       // Cambiamos de GET a POST y enviamos el 'body'
-      return this.http.post(`${this.apiUrl}/reports/generate`, body, {
+      return this.http.post(`${this.apiUrl}/reports/contrato`, body, {
         responseType: 'blob', // ¡Esto sigue siendo muy importante!
       });
     }
   // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
+  /**
+   * NUEVO
+   * Descarga el reporte para un GRUPO PIC
+   */
+  downloadPicReport(
+    projectName: string, // Este es el PIC individual que el usuario seleccionó
+    metadata: ReportMetadata,
+  ): Observable<Blob> {
+    const body = {
+      projectName: projectName,
+      metadata: metadata,
+    };
+    // Llama al nuevo endpoint específico
+    return this.http.post(`${this.apiUrl}/reports/pic`, body, {
+      responseType: 'blob',
+    });
+  }
+
 
   // ▼▼▼ AÑADIR ESTE NUEVO MÉTODO ▼▼▼
   /**
