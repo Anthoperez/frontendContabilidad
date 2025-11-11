@@ -26,6 +26,16 @@ export interface Gasto {
   fechaRetorno?: Date;
 }
 
+export interface GastoAnoAnterior {
+  year: number;
+  bienesCorrientes: number | null;
+  bienesCapital: number | null;
+  servicios: number | null;
+  subvencion: number | null;
+  viaticos: number | null;
+  encargoInterno: number | null;
+}
+
 // ▼▼▼ AÑADIR ESTA INTERFAZ ▼▼▼
 // Define la estructura de los metadatos opcionales
 export interface ReportMetadata {
@@ -46,15 +56,9 @@ export interface ReportMetadata {
   presupuestoEntidadEjecutoraAporteNoMonetario?: number | null;
   presupuestoEntidadAsociadaAporteMonetario?: number | null;
   presupuestoEntidadAsociadaAporteNoMonetario?: number | null;
-  gastosAnoAnterior?: {
-    year: number;
-    bienesCorrientes: number | null;
-    bienesCapital: number | null;
-    servicios: number | null;
-    subvencion: number | null;
-    viaticos: number | null;
-    encargoInterno: number | null;
-  };
+  
+  // 2. Modificamos esta propiedad para que sea un array
+  gastosAnosAnteriores?: GastoAnoAnterior[]; // Cambiado de 'gastosAnoAnterior' (singular) a 'gastosAnosAnteriores' (plural) y tipo array
 
 
 }

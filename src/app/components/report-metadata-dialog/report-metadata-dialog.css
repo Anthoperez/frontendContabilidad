@@ -72,3 +72,18 @@ hr {
   border-top: 1px solid #eee;
   margin: 20px 0;
 }
+
+/* Opcional: Añadir a report-metadata-dialog.css */
+.gastos-anterior-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}
+.gasto-anterior-year {
+  flex-grow: 1;
+  max-width: 150px; /* Opcional, para que no ocupe todo */
+}
+.gastos-anterior-grid-dinamico {
+  padding-bottom: 16px;
+}

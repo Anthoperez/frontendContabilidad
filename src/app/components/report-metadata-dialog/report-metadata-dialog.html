@@ -141,38 +141,61 @@
 
     <hr>
 
-    <h3>Ejecución de Gastos - Año Anterior ({{ metadataForm.get('gastosAnoAnterior.year')?.value }})</h3>
-    <div formGroupName="gastosAnoAnterior" class="gastos-anterior-grid">
-      <mat-form-field appearance="outline">
-        <mat-label>Año</mat-label>
-        <input matInput type="number" formControlName="year">
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Bienes Corrientes</mat-label>
-        <input matInput type="number" formControlName="bienesCorrientes">
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Bienes Capital</mat-label>
-        <input matInput type="number" formControlName="bienesCapital">
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Servicios</mat-label>
-        <input matInput type="number" formControlName="servicios">
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Subvención</mat-label>
-        <input matInput type="number" formControlName="subvencion">
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Viáticos</mat-label>
-        <input matInput type="number" formControlName="viaticos">
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Encargo Interno</mat-label>
-        <input matInput type="number" formControlName="encargoInterno">
-      </mat-form-field>
+    <h3>Ejecución de Gastos - Año Anteriores</h3>
+    <div formArrayName="gastosAnosAnteriores">
+
+      <div *ngFor="let gastoGroup of gastosAnosAnteriores.controls; let i = index" 
+           [formGroupName]="i" 
+           class="gastos-anterior-grid-dinamico"> <div class="gastos-anterior-header">
+          <mat-form-field appearance="outline" class="gasto-anterior-year">
+            <mat-label>Año</mat-label>
+            <input matInput type="number" formControlName="year" required>
+            <mat-error *ngIf="gastoGroup.get('year')?.hasError('required')">
+              El año es requerido.
+            </mat-error>
+          </mat-form-field>
+          <button mat-icon-button color="warn" type="button" 
+                  (click)="eliminarGastoAnoAnterior(i)" 
+                  [disabled]="gastosAnosAnteriores.length <= 1">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+
+        <div class="gastos-anterior-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Bienes Corrientes</mat-label>
+            <input matInput type="number" formControlName="bienesCorrientes">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Bienes Capital</mat-label>
+            <input matInput type="number" formControlName="bienesCapital">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Servicios</mat-label>
+            <input matInput type="number" formControlName="servicios">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Subvención</mat-label>
+            <input matInput type="number" formControlName="subvencion">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Viáticos</mat-label>
+            <input matInput type="number" formControlName="viaticos">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Encargo Interno</mat-label>
+            <input matInput type="number" formControlName="encargoInterno">
+          </mat-form-field>
+        </div>
+
+        <hr *ngIf="i < gastosAnosAnteriores.controls.length - 1"> </div>
     </div>
-    </form>
+
+    <button mat-stroked-button color="primary" type="button" (click)="agregarGastoAnoAnterior()" class="full-width" style="margin-top: 16px;">
+      <mat-icon>add</mat-icon>
+      Añadir Fila de Año Anterior
+    </button>
+        </form>
 
 </mat-dialog-content>
 

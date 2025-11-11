@@ -62,15 +62,7 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
       ingresos: this.fb.array([]),
 
       // ▼▼▼ NUEVOS CAMPOS PARA EJECUCIÓN DE GASTOS - AÑO ANTERIOR ▼▼▼
-      gastosAnoAnterior: this.fb.group({
-        year: [new Date().getFullYear() - 1], // Por defecto, el año anterior al actual
-        bienesCorrientes: [null as number | null],
-        bienesCapital: [null as number | null],
-        servicios: [null as number | null],
-        subvencion: [null as number | null],
-        viaticos: [null as number | null],
-        encargoInterno: [null as number | null],
-      }),
+      gastosAnosAnteriores: this.fb.array([]),
       // ▲▲▲ FIN NUEVOS CAMPOS GASTOS AÑO ANTERIOR ▲▲▲
     });
   }
@@ -100,6 +92,23 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     if (this.ingresos.length === 0) {
       this.nuevoIngreso();
     }
+
+
+    // ▼▼▼ CÓDIGO NUEVO AQUÍ ▼▼▼
+    // Lógica para cargar los gastos de años anteriores si existen
+    if (this.data && this.data.metadata && this.data.metadata.gastosAnosAnteriores) {
+      this.data.metadata.gastosAnosAnteriores.forEach((gasto: any) => {
+        this.gastosAnosAnteriores.push(this.nuevoGastoAnoAnteriorGroup(gasto));
+      });
+    }
+
+    // Si el FormArray sigue vacío, añadimos una fila por defecto
+    if (this.gastosAnosAnteriores.length === 0) {
+      this.agregarGastoAnoAnterior();
+    }
+    // ▲▲▲ FIN DE CÓDIGO NUEVO ▲▲▲
+
+
   }
 
   // Helper para acceder al FormArray de ingresos
@@ -121,6 +130,51 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
   eliminarIngreso(index: number): void {
     this.ingresos.removeAt(index);
   }
+  
+
+  // ▼▼▼ CÓDIGO NUEVO AQUÍ (Añadir estos 4 métodos) ▼▼▼
+
+  /**
+   * Helper para acceder al FormArray de gastosAnosAnteriores
+   */
+  get gastosAnosAnteriores(): FormArray {
+    return this.metadataForm.get('gastosAnosAnteriores') as FormArray;
+  }
+
+  /**
+   * Crea un FormGroup para una fila de gasto de año anterior
+   */
+  nuevoGastoAnoAnteriorGroup(gasto?: any): FormGroup {
+    return this.fb.group({
+      year: [gasto?.year || new Date().getFullYear() - 1, [Validators.required]],
+      bienesCorrientes: [gasto?.bienesCorrientes || null],
+      bienesCapital: [gasto?.bienesCapital || null],
+      servicios: [gasto?.servicios || null],
+      subvencion: [gasto?.subvencion || null],
+      viaticos: [gasto?.viaticos || null],
+      encargoInterno: [gasto?.encargoInterno || null],
+    });
+  }
+
+  /**
+   * Añade una nueva fila de gasto de año anterior al FormArray
+   */
+  agregarGastoAnoAnterior(): void {
+    this.gastosAnosAnteriores.push(this.nuevoGastoAnoAnteriorGroup());
+  }
+
+  /**
+   * Elimina una fila de gasto de año anterior por su índice
+   */
+  eliminarGastoAnoAnterior(index: number): void {
+    // Solo permite eliminar si hay más de una fila
+    if (this.gastosAnosAnteriores.length > 1) {
+      this.gastosAnosAnteriores.removeAt(index);
+    }
+  }
+  // ▲▲▲ FIN DE CÓDIGO NUEVO ▲▲▲
+
+
 
   onGenerar(): void {
     // Antes de cerrar, asegurarnos de que los montos sean números (si no son null)
@@ -143,16 +197,28 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
         }));
     }
 
-    // Procesar gastos del año anterior
-    if (formValue.gastosAnoAnterior) {
-      for (const key in formValue.gastosAnoAnterior) {
-        if (formValue.gastosAnoAnterior[key] === '') {
-          formValue.gastosAnoAnterior[key] = null;
-        } else if (key !== 'year') { // Asegura que los montos sean números
-          formValue.gastosAnoAnterior[key] = Number(formValue.gastosAnoAnterior[key]);
-        }
-      }
+    // ▼▼▼ MODIFICACIÓN AQUÍ ▼▼▼
+    // Procesar gastos del año anterior (ahora es un array)
+    if (formValue.gastosAnosAnteriores) {
+      formValue.gastosAnosAnteriores = formValue.gastosAnosAnteriores
+        .map((gasto: any) => {
+          // Limpiamos los valores de la fila
+          const filaLimpia: any = { year: Number(gasto.year) || (new Date().getFullYear() - 1) };
+          for (const key in gasto) {
+            if (key !== 'year') {
+              if (gasto[key] === '' || gasto[key] === null || gasto[key] === undefined) {
+                filaLimpia[key] = null;
+              } else {
+                filaLimpia[key] = Number(gasto[key]);
+              }
+            }
+          }
+          return filaLimpia;
+        })
+        // Filtramos filas que podrían estar vacías (aunque siempre tendrán un año)
+        .filter((gasto: any) => gasto.year); 
     }
+    // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
     this.dialogRef.close(formValue);
   }
