@@ -1,7 +1,7 @@
 // src/app/components/report-metadata-dialog/report-metadata-dialog.ts
 import { Component, Inject, OnInit } from '@angular/core'; // Añadir OnInit
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms'; // Añadir Validators
+import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms'; // Añadir Validators
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -46,17 +46,12 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     this.metadataForm = this.fb.group({
       investigador: [''],
       rr_investigador: [''], // Para la "R.R. Nº..."
-      fechaInicio: [null as Date | null],
+      fechaInicio: [''],
       duracion: [''],
       fechaCulminacion: [null],
       
       // ▼▼▼ NUEVOS CAMPOS PARA DESCRIPCION DE PRESUPUESTO ▼▼▼
-      presupuestoProcienciaAporteMonetario: [null as number | null],
-      presupuestoProcienciaAporteNoMonetario: [null as number | null], // Nuevo
-      presupuestoEntidadEjecutoraAporteMonetario: [null as number | null],
-      presupuestoEntidadEjecutoraAporteNoMonetario: [null as number | null], // Nuevo
-      presupuestoEntidadAsociadaAporteMonetario: [null as number | null], // Nuevo
-      presupuestoEntidadAsociadaAporteNoMonetario: [null as number | null], // Nuevo
+      presupuestoEntidades: this.fb.array([]),
       // ▲▲▲ FIN NUEVOS CAMPOS PRESUPUESTO ▲▲▲
 
       ingresos: this.fb.array([]),
@@ -72,25 +67,13 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
   ngOnInit(): void {
     // Para asegurarnos de que haya al menos una fila de ingreso al iniciar
 
-    if(this.data && this.data.metadata) {
-      this.metadataForm.patchValue(this.data.metadata);
-      if(this.data.metadata.ingresos){
-        this.data.metadata.ingresos.forEach((ingreso: any) => {
-          this.nuevoIngreso();
-          const lastIndex = this.ingresos.length - 1;
-          const ingresoGroup = this.ingresos.at(lastIndex);
-          ingresoGroup.patchValue({
-            descripcion: ingreso.descripcion,
-            monto: ingreso.monto
-          });
-        });
-      }
-    }else{
-      this.ingresos;
+    if (this.data && this.data.metadata && this.data.metadata.ingresos) {
+      this.data.metadata.ingresos.forEach((ingreso: any) => {
+        this.ingresos.push(this.nuevoIngreso(ingreso));
+      });
     }
-
     if (this.ingresos.length === 0) {
-      this.nuevoIngreso();
+      this.agregarIngreso(); // Añadir una fila de ingreso por defecto
     }
 
 
@@ -108,7 +91,21 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     }
     // ▲▲▲ FIN DE CÓDIGO NUEVO ▲▲▲
 
-
+    // ▼▼▼ --- NUEVA LÓGICA PARA PRESUPUESTO DINÁMICO --- ▼▼▼
+    if (this.data && this.data.metadata && this.data.metadata.presupuestoEntidades) {
+      // Si vienen datos, los cargamos
+      this.data.metadata.presupuestoEntidades.forEach((entidad: any) => {
+        this.presupuestoEntidades.push(this.nuevoEntidadPresupuesto(entidad));
+      });
+    }
+    
+    // Si el array está vacío, añadimos las 3 filas por defecto
+    if (this.presupuestoEntidades.length === 0) {
+      this.agregarEntidadPresupuesto('PROCIENCIA');
+      this.agregarEntidadPresupuesto('Entidad Ejecutora');
+      this.agregarEntidadPresupuesto('Entidad Asociada');
+    }
+    // ▲▲▲ --- FIN DE LA NUEVA LÓGICA --- ▲▲▲
   }
 
   // Helper para acceder al FormArray de ingresos
@@ -117,13 +114,15 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
   }
 
   // Añade un nuevo grupo de ingreso (descripción + monto)
-  nuevoIngreso(): void {
-    this.ingresos.push(
-      this.fb.group({
-        descripcion: [''], // Ya no es Validators.required, puede ir vacío
-        monto: [null as number | null], // Ya no es Validators.required, puede ir vacío
-      }),
-    );
+  nuevoIngreso(ingreso?: any): FormGroup {
+    return this.fb.group({
+      descripcion: [ingreso?.descripcion || ''],
+      monto: [ingreso?.monto || null],
+    });
+  }
+
+  agregarIngreso(): void {
+    this.ingresos.push(this.nuevoIngreso());
   }
 
   // Elimina un ingreso por su índice
@@ -174,6 +173,27 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
   }
   // ▲▲▲ FIN DE CÓDIGO NUEVO ▲▲▲
 
+  // ▼▼▼ --- NUEVOS HELPERS PARA PRESUPUESTO DINÁMICO --- ▼▼▼
+  get presupuestoEntidades(): FormArray {
+    return this.metadataForm.get('presupuestoEntidades') as FormArray;
+  }
+
+  nuevoEntidadPresupuesto(nombre: string = ''): FormGroup {
+    return this.fb.group({
+      nombreEntidad: [nombre, Validators.required],
+      aporteNoMonetario: [null as number | null],
+      aporteMonetario: [null as number | null],
+    });
+  }
+
+  agregarEntidadPresupuesto(nombre: string = ''): void {
+    this.presupuestoEntidades.push(this.nuevoEntidadPresupuesto(nombre));
+  }
+
+  eliminarEntidadPresupuesto(index: number): void {
+    this.presupuestoEntidades.removeAt(index);
+  }
+  // ▲▲▲ --- FIN DE NUEVOS HELPERS --- ▲▲▲
 
 
   onGenerar(): void {
@@ -220,6 +240,26 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     }
     // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
+    // ▼▼▼ --- NUEVA LÓGICA PARA PROCESAR PRESUPUESTO DINÁMICO --- ▼▼▼
+    if (formValue.presupuestoEntidades) {
+      formValue.presupuestoEntidades = formValue.presupuestoEntidades
+        .filter((ent: any) => ent.nombreEntidad || ent.aporteNoMonetario !== null || ent.aporteMonetario !== null)
+        .map((ent: any) => ({
+          nombreEntidad: ent.nombreEntidad,
+          aporteNoMonetario: ent.aporteNoMonetario !== null ? Number(ent.aporteNoMonetario) : null,
+          aporteMonetario: ent.aporteMonetario !== null ? Number(ent.aporteMonetario) : null,
+        }));
+    }
+    // ▲▲▲ --- FIN DE LA NUEVA LÓGICA --- ▲▲▲
+
+    // Eliminar los campos fijos que ya no existen
+    delete formValue.presupuestoProcienciaAporteMonetario;
+    delete formValue.presupuestoProcienciaAporteNoMonetario;
+    delete formValue.presupuestoEntidadEjecutoraAporteMonetario;
+    delete formValue.presupuestoEntidadEjecutoraAporteNoMonetario;
+    delete formValue.presupuestoEntidadAsociadaAporteMonetario;
+    delete formValue.presupuestoEntidadAsociadaAporteNoMonetario;
+
     this.dialogRef.close(formValue);
   }
 
@@ -231,39 +271,35 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
    * Al entrar (focus) a un campo de moneda, muestra el número simple.
    * Ej: "23,500.00" -> "23500.00"
    */
-  onCurrencyFocus(event: FocusEvent): void {
-    const input = event.target as HTMLInputElement;
-    const controlName = input.getAttribute('formControlName') as 'presupuestoProcienciaAporteNoMonetario' | 'presupuestoProcienciaAporteMonetario' | 'presupuestoEntidadEjecutoraAporteNoMonetario' | 'presupuestoEntidadEjecutoraAporteMonetario' | 'presupuestoEntidadAsociadaAporteNoMonetario' | 'presupuestoEntidadAsociadaAporteMonetario' | 'monto';
-    const control = this.metadataForm.get(controlName);
+  onCurrencyFocus(event: FocusEvent, control: AbstractControl | null): void {
+    if (!control) return;
     
-    if (control && control.value !== null) {
+    const input = event.target as HTMLInputElement;
+    if (control.value !== null) {
       input.value = Number(control.value).toFixed(2);
+      input.select();
     }
   }
 
   /**
-   * Al salir (blur) de un campo de moneda:
-   * 1. Parsea el valor (ej: "23,500.5" o "23500.5") a un número.
-   * 2. Guarda el número limpio en el form control.
-   * 3. Muestra el valor formateado en el input (ej: "23,500.50").
+   * CORREGIDO: Ahora acepta el AbstractControl específico del FormArray
    */
-  onCurrencyBlur(event: FocusEvent, controlName: 'presupuestoProcienciaAporteNoMonetario' | 'presupuestoProcienciaAporteMonetario' | 'presupuestoEntidadEjecutoraAporteNoMonetario' | 'presupuestoEntidadEjecutoraAporteMonetario' | 'presupuestoEntidadAsociadaAporteNoMonetario' | 'presupuestoEntidadAsociadaAporteMonetario' | 'monto' ): void {
+  onCurrencyBlur(event: FocusEvent, control: AbstractControl | null): void {
+    if (!control) return;
+
     const input = event.target as HTMLInputElement;
-    const control = this.metadataForm.get(controlName);
+    const rawValue = input.value.replace(/,/g, '');
+    const numValue = parseFloat(rawValue);
 
-    if (control) {
-      const rawValue = input.value.replace(/,/g, ''); // Quita comas
-      const numValue = parseFloat(rawValue);
-
-      if (!isNaN(numValue)) {
-        control.setValue(numValue); // Guarda el número
-        input.value = this.formatter.format(numValue); // Muestra formateado
-      } else {
-        control.setValue(null); // Borra si no es un número
-        input.value = '';
-      }
+    if (!isNaN(numValue)) {
+      control.setValue(numValue); // Guarda el número limpio
+      input.value = this.formatter.format(numValue); // Muestra formateado
+    } else {
+      control.setValue(null); // Borra si no es un número
+      input.value = '';
     }
   }
+  // ▲▲▲ --- FIN DE LA CORRECCIÓN DE BUG --- ▲▲▲
 
   
 }

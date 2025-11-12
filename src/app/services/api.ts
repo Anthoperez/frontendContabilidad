@@ -41,7 +41,7 @@ export interface GastoAnoAnterior {
 export interface ReportMetadata {
   investigador?: string;
   rr_investigador?: string;
-  fechaInicio?: Date | null;
+  fechaInicio?: string;
   duracion?: string;
   fechaCulminacion?: Date;
   ingresos?: {
@@ -49,13 +49,14 @@ export interface ReportMetadata {
   monto: number;
   }[];
 
-  // (Añade los otros campos si los tienes, como presupuesto, etc.)
-  presupuestoProcienciaAporteMonetario?: number | null;
-  presupuestoProcienciaAporteNoMonetario?: number | null;
-  presupuestoEntidadEjecutoraAporteMonetario?: number | null;
-  presupuestoEntidadEjecutoraAporteNoMonetario?: number | null;
-  presupuestoEntidadAsociadaAporteMonetario?: number | null;
-  presupuestoEntidadAsociadaAporteNoMonetario?: number | null;
+  // ▼▼▼ --- MODIFICACIÓN AQUÍ --- ▼▼▼
+  // Se añade el nuevo array dinámico
+  presupuestoEntidades?: {
+    nombreEntidad: string;
+    aporteNoMonetario: number | null;
+    aporteMonetario: number | null;
+  }[];
+  // ▲▲▲ --- FIN DE LA MODIFICACIÓN --- ▲▲▲
   
   // 2. Modificamos esta propiedad para que sea un array
   gastosAnosAnteriores?: GastoAnoAnterior[]; // Cambiado de 'gastosAnoAnterior' (singular) a 'gastosAnosAnteriores' (plural) y tipo array

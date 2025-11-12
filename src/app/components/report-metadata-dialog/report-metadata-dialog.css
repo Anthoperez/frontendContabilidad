@@ -1,12 +1,13 @@
 /* src/app/components/report-metadata-dialog/report-metadata-dialog.css */
 
 .report-metadata-dialog {
-  width: 100%; /* Ancho fijo para el diálogo */
+  max-width: 90vw; /* Ancho fijo para el diálogo */
 }
 
 .dialog-content {
   max-height: 80vh; /* Permite scroll si el contenido es muy largo */
   overflow-y: auto; /* Habilita el scroll vertical */
+  padding: 20px;
 }
 
 .metadata-form {
@@ -87,3 +88,40 @@ hr {
 .gastos-anterior-grid-dinamico {
   padding-bottom: 16px;
 }
+
+/* ▼▼▼ AÑADE ESTOS NUEVOS ESTILOS ▼▼▼ */
+.dynamic-presupuesto-grid {
+  display: grid;
+  /* 5 columnas: Nombre, Aporte1, Aporte2, Total, Botón */
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dynamic-presupuesto-grid .header-cell {
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #555;
+  text-align: center;
+  margin-bottom: -8px; /* Acerca la cabecera a las filas */
+}
+.dynamic-presupuesto-grid .header-cell.label-cell {
+  text-align: left;
+  padding-left: 8px;
+}
+
+/* Ocupa la primera columna (más ancha) */
+.dynamic-presupuesto-grid .cell-entidad {
+  grid-column: 1 / 2;
+}
+
+.dynamic-presupuesto-grid .total-cell input {
+  font-weight: bold;
+  color: #333;
+}
+
+.dynamic-presupuesto-grid .delete-button {
+  margin-top: -16px; /* Alinea el botón con los inputs */
+}
+/* ▲▲▲ FIN DE NUEVOS ESTILOS ▲▲▲ */
