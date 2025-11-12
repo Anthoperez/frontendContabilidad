@@ -55,6 +55,20 @@ export class ReportGeneratorComponent implements OnInit {
   // --- FIN DE PROPIEDADES MODIFICADAS ---
 
 
+  // ▼▼▼ AÑADIR ESTA PROPIEDAD ▼▼▼
+  modalidadesPIC: string[] = [
+    'PIC 2021 - MOD. 01 (Básica y Aplicada)',
+    'PIC 2021 - MOD. 02 (Tesis Pregrado)',
+    'PIC 2022 - MOD. 01 (Aplicada)',
+    'PIC 2022 - MOD. 02 (Consolidado y Emergente)',
+    'PIC 2022 - EMBLEMATICO',
+    'PIC 2023 - MOD. 01 (Científica)',
+    'PIC 2023 - MOD. 03 (Emblemática)',
+    // ... (Puedes añadir el resto de modalidades de 2023 y 2024 aquí) ...
+  ];
+  // ▲▲▲ FIN DE LA PROPIEDAD ▲▲▲
+
+
   // ▼▼▼ INYECTAR 'MatDialog' ▼▼▼
   constructor(
     private apiService: ApiService, 
@@ -66,7 +80,7 @@ export class ReportGeneratorComponent implements OnInit {
   ngOnInit(): void {
     // Cargamos ambas listas de proyectos al iniciar
     this.loadContratoProjects();
-    this.loadPicProjects();
+    //this.loadPicProjects();
   }
 
 // --- MÉTODOS DE CARGA SEPARADOS ---
@@ -85,17 +99,18 @@ export class ReportGeneratorComponent implements OnInit {
   }
 
   loadPicProjects(): void {
-    this.isLoadingPics = true;
-    this.apiService.getPicProjects().subscribe({
-      next: (data) => {
-        this.picProjects = data;
-        this.isLoadingPics = false;
-      },
-      error: () => {
-        this.isLoadingPics = false;
-        this.showError('No se pudo cargar la lista de Proyectos PIC.');
-      }
-    });
+    // this.isLoadingPics = true;
+    // this.apiService.getPicProjects().subscribe({
+    //   next: (data) => {
+    //     this.picProjects = data;
+    //     this.isLoadingPics = false;
+    //   },
+    //   error: () => {
+    //     this.isLoadingPics = false;
+    //     this.showError('No se pudo cargar la lista de Proyectos PIC.');
+    //   }
+    // });
+    this.isLoadingPics = false; // Simplemente detenemos la carga
   }
   // --- FIN DE MÉTODOS DE CARGA ---
 
@@ -144,32 +159,24 @@ export class ReportGeneratorComponent implements OnInit {
       return;
     }
 
-    // Los reportes PIC también pueden tener metadatos (aunque no los usen todos)
-    // Usamos el mismo diálogo para mantener la Opción A (dejar en blanco) o C (usar global)
-    const dialogRef = this.dialog.open(ReportMetadataDialogComponent, {
-      width: '600px',
-      disableClose: true,
-    });
 
-    dialogRef.afterClosed().subscribe((metadata: ReportMetadata | undefined) => {
-      if (metadata === undefined) {
-        return; // Usuario canceló
+    this.isGenerating = true;
+    const modalityName = this.selectedPicProject;
+
+    // Llama al endpoint de PIC (que ahora espera una modalidad, no metadata)
+    this.apiService.downloadPicReport(modalityName).subscribe({
+      next: (blob) => {
+        this.downloadFile(blob, `Reporte_PIC_${modalityName.replace(/[^a-z0-9]/gi, '_')}.xlsx`);
+        this.isGenerating = false;
+      },
+      error: (err) => {
+        this.isGenerating = false;
+        this.showError('Ocurrió un error al generar el reporte PIC.');
+        console.error('Error al descargar:', err);
       }
-      
-      this.isGenerating = true;
-      // Llama al endpoint específico de PIC
-      this.apiService.downloadPicReport(this.selectedPicProject, metadata).subscribe({
-        next: (blob) => {
-          this.downloadFile(blob, `Reporte_PIC_${this.selectedPicProject.replace(/[^a-z0-9]/gi, '_')}.xlsx`);
-          this.isGenerating = false;
-        },
-        error: (err) => {
-          this.isGenerating = false;
-          this.showError('Ocurrió un error al generar el reporte PIC.');
-          console.error('Error al descargar:', err);
-        }
-      });
     });
+  
+      
   }
 
 

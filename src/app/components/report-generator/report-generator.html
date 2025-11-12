@@ -96,7 +96,7 @@
       </div>
 
       <div
-        *ngIf="!isLoadingPics && picProjects.length > 0"
+        *ngIf="!isLoadingPics && modalidadesPIC.length > 0"
         class="action-container"
       >
         <img src="/assets/reporte.png" alt="Reporte" class="report-illustration" />
@@ -107,11 +107,11 @@
         </p>
 
         <mat-form-field appearance="outline" class="project-selector">
-          <mat-label>Seleccionar Proyecto PIC</mat-label>
+          <mat-label>Seleccionar Modalidad PIC</mat-label>
           <mat-icon matPrefix>topic</mat-icon>
           <mat-select [(ngModel)]="selectedPicProject">
-            <mat-option *ngFor="let project of picProjects" [value]="project">
-              {{ project }}
+            <mat-option *ngFor="let mod of modalidadesPIC" [value]="mod">
+              {{ mod }}
             </mat-option>
           </mat-select>
         </mat-form-field>

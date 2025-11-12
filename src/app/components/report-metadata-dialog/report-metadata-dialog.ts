@@ -29,7 +29,7 @@ import { MatNativeDateModule } from '@angular/material/core'; // Importar si no 
 })
 export class ReportMetadataDialogComponent implements OnInit { // Implementar OnInit
   metadataForm: FormGroup;
-
+  reportType: 'contrato' | 'pic' = 'contrato'; // Tipo de reporte
    // ▼▼▼ AÑADIR ESTE FORMATEADOR DE MONEDA ▼▼▼
   private formatter = new Intl.NumberFormat('es-PE', {
     style: 'decimal',
@@ -43,6 +43,13 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any, // Datos opcionales si se pasan
   ) {
+
+    // ▼▼▼ AÑADIR ESTA LÓGICA ▼▼▼
+    if (data && data.reportType === 'pic') {
+      this.reportType = 'pic';
+    }
+    // ▲▲▲ FIN DE LA LÓGICA ▲▲▲
+
     this.metadataForm = this.fb.group({
       investigador: [''],
       rr_investigador: [''], // Para la "R.R. Nº..."
@@ -53,6 +60,9 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
       // ▼▼▼ NUEVOS CAMPOS PARA DESCRIPCION DE PRESUPUESTO ▼▼▼
       presupuestoEntidades: this.fb.array([]),
       // ▲▲▲ FIN NUEVOS CAMPOS PRESUPUESTO ▲▲▲
+
+      // --- Campos Fijos para PIC ---
+      presupuestoTotalPic: [null as number | null],
 
       ingresos: this.fb.array([]),
 
@@ -92,10 +102,11 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     // ▲▲▲ FIN DE CÓDIGO NUEVO ▲▲▲
 
     // ▼▼▼ --- NUEVA LÓGICA PARA PRESUPUESTO DINÁMICO --- ▼▼▼
+    if (this.reportType === 'contrato') {
     if (this.data && this.data.metadata && this.data.metadata.presupuestoEntidades) {
       // Si vienen datos, los cargamos
       this.data.metadata.presupuestoEntidades.forEach((entidad: any) => {
-        this.presupuestoEntidades.push(this.nuevoEntidadPresupuesto(entidad));
+        this.presupuestoEntidades.push(this.nuevoEntidadPresupuesto(entidad.nombreEntidad));
       });
     }
     
@@ -104,6 +115,12 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
       this.agregarEntidadPresupuesto('PROCIENCIA');
       this.agregarEntidadPresupuesto('Entidad Ejecutora');
       this.agregarEntidadPresupuesto('Entidad Asociada');
+    }
+    } else {
+      // Cargar presupuesto fijo (si es PIC)
+      if (this.data && this.data.metadata && this.data.metadata.presupuestoTotalPic) {
+        this.metadataForm.get('presupuestoTotalPic')?.setValue(this.data.metadata.presupuestoTotalPic);
+      }
     }
     // ▲▲▲ --- FIN DE LA NUEVA LÓGICA --- ▲▲▲
   }
@@ -241,24 +258,26 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
     // ▼▼▼ --- NUEVA LÓGICA PARA PROCESAR PRESUPUESTO DINÁMICO --- ▼▼▼
+    if (this.reportType === 'contrato') {
     if (formValue.presupuestoEntidades) {
       formValue.presupuestoEntidades = formValue.presupuestoEntidades
-        .filter((ent: any) => ent.nombreEntidad || ent.aporteNoMonetario !== null || ent.aporteMonetario !== null)
-        .map((ent: any) => ({
-          nombreEntidad: ent.nombreEntidad,
-          aporteNoMonetario: ent.aporteNoMonetario !== null ? Number(ent.aporteNoMonetario) : null,
-          aporteMonetario: ent.aporteMonetario !== null ? Number(ent.aporteMonetario) : null,
+          .filter((ent: any) => ent.nombreEntidad || ent.aporteNoMonetario !== null || ent.aporteMonetario !== null)
+          .map((ent: any) => ({
+            nombreEntidad: ent.nombreEntidad,
+            aporteNoMonetario: ent.aporteNoMonetario !== null ? Number(ent.aporteNoMonetario) : null,
+            aporteMonetario: ent.aporteMonetario !== null ? Number(ent.aporteMonetario) : null,
         }));
     }
+    // Borrar el campo de PIC
+      delete formValue.presupuestoTotalPic;
     // ▲▲▲ --- FIN DE LA NUEVA LÓGICA --- ▲▲▲
 
-    // Eliminar los campos fijos que ya no existen
-    delete formValue.presupuestoProcienciaAporteMonetario;
-    delete formValue.presupuestoProcienciaAporteNoMonetario;
-    delete formValue.presupuestoEntidadEjecutoraAporteMonetario;
-    delete formValue.presupuestoEntidadEjecutoraAporteNoMonetario;
-    delete formValue.presupuestoEntidadAsociadaAporteMonetario;
-    delete formValue.presupuestoEntidadAsociadaAporteNoMonetario;
+    } else {
+      // Procesar presupuesto FIJO (PIC)
+      formValue.presupuestoTotalPic = formValue.presupuestoTotalPic !== null ? Number(formValue.presupuestoTotalPic) : null;
+      // Borrar el campo de Contrato
+      delete formValue.presupuestoEntidades;
+    }
 
     this.dialogRef.close(formValue);
   }

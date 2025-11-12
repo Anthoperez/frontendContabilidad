@@ -136,12 +136,11 @@ export class ApiService {
    * Descarga el reporte para un GRUPO PIC
    */
   downloadPicReport(
-    projectName: string, // Este es el PIC individual que el usuario seleccionó
-    metadata: ReportMetadata,
+    modalityName: string, // Ahora es el nombre de la modalidad
+    // ¡Ya no hay metadata!
   ): Observable<Blob> {
     const body = {
-      projectName: projectName,
-      metadata: metadata,
+      modalityName: modalityName, // El backend debe esperar 'modalityName'
     };
     // Llama al nuevo endpoint específico
     return this.http.post(`${this.apiUrl}/reports/pic`, body, {
