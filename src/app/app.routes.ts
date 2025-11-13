@@ -5,7 +5,7 @@ import { GastoFormComponent } from './components/gasto-form/gasto-form';
 import { GastoListComponent } from './components/gasto-list/gasto-list';
 import { ExcelImporterComponent } from './components/excel-importer/excel-importer';
 import { ReportGeneratorComponent } from './components/report-generator/report-generator';
-
+import { PicMetadataFormComponent } from './components/pic-metadata-form/pic-metadata-form';
 
 export const routes: Routes = [
   // Redirección por defecto: si entran a la raíz, llévalos a la lista de gastos
@@ -17,6 +17,7 @@ export const routes: Routes = [
   { path: 'importar', component: ExcelImporterComponent },
   { path: 'reportes', component: ReportGeneratorComponent },
   
+  { path: 'configurar-pic', component: PicMetadataFormComponent },
   // Una ruta "catch-all" por si el usuario navega a una URL que no existe
   { path: '**', redirectTo: '/gastos' } 
 ];

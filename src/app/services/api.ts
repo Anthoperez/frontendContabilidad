@@ -36,6 +36,22 @@ export interface GastoAnoAnterior {
   encargoInterno: number | null;
 }
 
+// ▼▼▼ AÑADIR ESTAS DOS NUEVAS INTERFACES ▼▼▼
+export interface IngresoPic {
+  descripcion: string;
+  monto: number | null;
+}
+
+export interface PicMetadataDto {
+  projectName: string;
+  investigador?: string;
+  duracion?: string;
+  presupuestoTotal?: number | null;
+  ingresos?: IngresoPic[];
+  gastosAnosAnteriores?: GastoAnoAnterior[]; // Reutilizamos la interfaz que ya tenías
+}
+// ▲▲▲ FIN DE LAS NUEVAS INTERFACES ▲▲▲
+
 // ▼▼▼ AÑADIR ESTA INTERFAZ ▼▼▼
 // Define la estructura de los metadatos opcionales
 export interface ReportMetadata {
@@ -159,6 +175,34 @@ export class ApiService {
     });
   }
   // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
+
+
+  /**
+   * Obtiene la metadata guardada para un proyecto PIC específico.
+   */
+  getPicMetadata(projectName: string): Observable<PicMetadataDto | null> {
+    // Codificamos el nombre del proyecto para que sea seguro en una URL
+    const encodedProjectName = encodeURIComponent(projectName);
+    return this.http.get<PicMetadataDto | null>(
+      `${this.apiUrl}/pic-metadata/${encodedProjectName}`,
+    );
+  }
+
+  /**
+   * Guarda o actualiza la metadata para un proyecto PIC específico.
+   */
+  savePicMetadata(
+    projectName: string,
+    data: PicMetadataDto,
+  ): Observable<PicMetadataDto> {
+    const encodedProjectName = encodeURIComponent(projectName);
+    return this.http.post<PicMetadataDto>(
+      `${this.apiUrl}/pic-metadata/${encodedProjectName}`,
+      data,
+    );
+  }
+// ▲▲▲ FIN DE LAS NUEVAS FUNCIONES ▲▲▲
+
 
   
 }

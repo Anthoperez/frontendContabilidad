@@ -1,0 +1,100 @@
+/* src/app/components/pic-metadata-form/pic-metadata-form.css */
+.pic-form-container {
+  max-width: 900px;
+  margin: 2rem auto;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.presupuesto-field {
+  width: 50%;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 24px 0;
+}
+
+/* --- Estilos para Filas Dinámicas (Ingresos) --- */
+.dynamic-row {
+  display: grid;
+  grid-template-columns: 1fr 200px auto;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.dynamic-row .desc-field {
+  flex-grow: 1;
+}
+
+.dynamic-row .monto-field {
+  width: 200px;
+}
+
+.dynamic-row button {
+  margin-top: -16px; /* Alinear botón con inputs */
+}
+
+/* --- Estilos para Gastos Años Anteriores --- */
+.gasto-anterior-dynamic-grid {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #fafafa;
+}
+
+.gasto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.gasto-header .year-field {
+  max-width: 150px;
+}
+
+.gasto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* Para pantallas más pequeñas */
+@media (max-width: 768px) {
+  .form-grid, .gasto-grid {
+    grid-template-columns: 1fr;
+  }
+  .dynamic-row {
+    grid-template-columns: 1fr;
+  }
+  .dynamic-row .monto-field {
+    width: 100%;
+  }
+  .dynamic-row button {
+    margin-top: -10px;
+    justify-self: end;
+  }
+  .presupuesto-field {
+    width: 100%;
+  }
+}
