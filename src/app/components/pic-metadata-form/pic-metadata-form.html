@@ -26,11 +26,11 @@
                 <mat-error *ngIf="selectedProject.hasError('required')">Debe seleccionar un proyecto</mat-error>
             </mat-form-field>
 
-            <div *ngIf="isLoading" class="spinner-container">
+            <div *ngIf="isPageLoading" class="spinner-container">
                 <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
             </div>
 
-            <form [formGroup]="metadataForm" *ngIf="!isLoading && selectedProject.value">
+            <form [formGroup]="metadataForm" *ngIf="!isPageLoading && selectedProject.value">
 
                 <h3>Datos Generales del Proyecto</h3>
                 <div class="form-grid">
@@ -139,19 +139,36 @@
 
                     </div>
                 </div>
-                <button mat-stroked-button color="primary" type="button" (click)="agregarGastoAnoAnterior()"
-                    class="full-width">
+                <button mat-stroked-button color="primary" type="button" (click)="agregarGastoAnoAnterior()" class="full-width">
                     <mat-icon>add</mat-icon> Añadir Fila de Año Anterior
                 </button>
-            </form>
-        </mat-card-content>
-
-        <mat-card-actions align="end">
-            <button mat-raised-button color="accent"
-                [disabled]="isLoading || metadataForm.invalid || selectedProject.invalid" (click)="saveData()">
-                <mat-icon>save</mat-icon>
-                Guardar Datos del Proyecto
-            </button>
-        </mat-card-actions>
-    </mat-card>
-</div>
+                </form>
+                </mat-card-content>
+                
+                <mat-card-actions align="end">
+                    <button mat-raised-button color="accent"
+                        [disabled]="saveState !== 'idle' || isPageLoading || metadataForm.invalid || selectedProject.invalid"
+                        (click)="saveData()">
+                        <ng-container [ngSwitch]="saveState">
+                
+                            <span *ngSwitchCase="'saving'" class="button-content-wrapper">
+                                <mat-progress-spinner diameter="20" mode="indeterminate"
+                                    [style.margin-right.px]="8"></mat-progress-spinner>
+                                Guardando...
+                            </span>
+                
+                            <span *ngSwitchCase="'saved'" class="button-content-wrapper">
+                                <mat-icon>check</mat-icon>
+                                ¡Guardado!
+                            </span>
+                
+                            <span *ngSwitchDefault class="button-content-wrapper">
+                                <mat-icon>save</mat-icon>
+                                Guardar Datos del Proyecto
+                            </span>
+                
+                        </ng-container>
+                    </button>
+                </mat-card-actions>
+                </mat-card>
+                </div>

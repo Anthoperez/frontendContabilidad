@@ -55,8 +55,9 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
   public filteredProjects: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
   private _onDestroy = new Subject<void>();
 
-  isLoading = false; // Para el spinner de carga/guardado
-  isFetchingList = true; // Para el spinner del dropdown
+  isPageLoading = false; // Se usa para ocultar el form mientras se carga
+  saveState : 'idle' | 'saving' | 'saved' = 'idle'; // <-- PROPIEDAD ACTUALIZADA;      // Se usa para deshabilitar el botón de guardar
+  isFetchingList = true;
 
   private formatter = new Intl.NumberFormat('es-PE', {
     style: 'decimal',
@@ -146,7 +147,8 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
    * Carga la metadata existente para el proyecto seleccionado
    */
   loadData(projectName: string): void {
-    this.isLoading = true;
+    this.isPageLoading = true;
+    this.saveState = 'idle'; // <-- AÑADIDO: Resetea el botón de guardar
     this.apiService.getPicMetadata(projectName).subscribe({
       next: (data) => {
         // Limpiar el formulario antes de cargar
@@ -179,10 +181,10 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
         if (this.ingresos.length === 0) this.agregarIngreso();
         if (this.gastosAnosAnteriores.length === 0) this.agregarGastoAnoAnterior();
 
-        this.isLoading = false;
+        this.isPageLoading = false;
       },
       error: () => {
-        this.isLoading = false;
+        this.isPageLoading = false;
         this.showError('Error al cargar los datos del proyecto.');
       },
     });
@@ -192,12 +194,13 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
    * Guarda los datos del formulario en el backend
    */
   saveData(): void {
+    this.metadataForm.updateValueAndValidity();
     if (this.metadataForm.invalid || this.selectedProject.invalid) {
       this.showError('Formulario inválido. Revise los campos.');
       return;
     }
 
-    this.isLoading = true;
+    this.saveState = 'saving';
     const projectName = this.selectedProject.value!;
     
     // Preparamos los datos para enviar
@@ -206,13 +209,13 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
       projectName: projectName,
       investigador: formData.investigador || '',
       duracion: formData.duracion || '',
-      presupuestoTotal: Number(formData.presupuestoTotal) || null,
+      presupuestoTotal: parseFloat(String(formData.presupuestoTotal).replace(/,/g, '')) || null,
       ingresos: formData.ingresos
         .map((ing: any) => ({
           descripcion: ing.descripcion,
-          monto: Number(ing.monto) || null,
+          monto: parseFloat(String(ing.monto).replace(/,/g, '')) || null,
         }))
-        .filter((ing: IngresoPic) => ing.descripcion || ing.monto), // Quitar filas vacías
+        .filter((ing: IngresoPic) => ing.descripcion || ing.monto !== null), // Quitar filas vacías
       gastosAnosAnteriores: formData.gastosAnosAnteriores
         .map((gasto: any) => {
           const filaLimpia = {
@@ -230,13 +233,16 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
 
     this.apiService.savePicMetadata(projectName, dataToSend).subscribe({
       next: () => {
-        this.isLoading = false;
+        this.saveState = 'idle';
         this.showSuccess('¡Datos guardados con éxito!');
         // Opcional: recargar los datos
         // this.loadData(projectName);
+        setTimeout(() => {
+          this.saveState = 'idle';
+        }, 2000);
       },
       error: () => {
-        this.isLoading = false;
+        this.saveState = 'idle'; // <-- Volver al estado 'idle'
         this.showError('Error al guardar los datos.');
       },
     });
