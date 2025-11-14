@@ -81,20 +81,7 @@
     
 
     <div *ngIf="reportType === 'pic'">
-      <div *ngIf="isLoadingPics" class="state-container">
-        <mat-spinner diameter="50"></mat-spinner>
-        <p>Cargando Proyectos PIC...</p>
-      </div>
-
-      <div
-        *ngIf="!isLoadingPics && picProjects.length === 0"
-        class="state-container empty-state"
-      >
-        <mat-icon class="empty-icon">folder_off</mat-icon>
-        <h3>No hay PICs disponibles</h3>
-        <p>Agregue gastos a un proyecto PIC para que aparezca aquí.</p>
-      </div>
-
+      
       <div
         *ngIf="!isLoadingPics && modalidadesPIC.length > 0"
         class="action-container"
