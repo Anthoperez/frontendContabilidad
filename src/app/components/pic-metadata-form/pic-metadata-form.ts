@@ -113,7 +113,7 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
    */
   loadProjectList(): void {
     this.isFetchingList = true;
-    this.apiService.getPicProjects().subscribe({
+    this.apiService.getMasterPicProjectList().subscribe({
       next: (projects) => {
         this.picProjects = projects;
         this.filteredProjects.next(projects.slice());
@@ -233,10 +233,10 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
 
     this.apiService.savePicMetadata(projectName, dataToSend).subscribe({
       next: () => {
-        this.saveState = 'idle';
+        this.saveState = 'saved';
         this.showSuccess('¡Datos guardados con éxito!');
         // Opcional: recargar los datos
-        // this.loadData(projectName);
+        this.loadData(projectName);
         setTimeout(() => {
           this.saveState = 'idle';
         }, 2000);

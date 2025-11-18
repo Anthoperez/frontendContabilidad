@@ -11,7 +11,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px; /* Asegura un ancho mínimo para la tabla */
+  min-width: 1200px; /* Asegura un ancho mínimo para la tabla */
 
 }
 
@@ -44,4 +44,64 @@ th.mat-header-cell, td.mat-cell {
   color: #D32F2F !important; /* Rojo oscuro */
   background-color: #FFEBEE !important; /* Fondo rojo claro */
 }
-/* ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲ */
+
+mat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Para pantallas pequeñas */
+}
+
+/* Campo de filtro */
+.filter-field {
+  width: 100%;
+  max-width: 400px;
+  margin-right: 16px;
+}
+
+/* Botón de eliminar todo */
+.delete-all-button {
+  margin-left: auto; /* Empuja el botón a la derecha */
+}
+
+/* Columna de acciones */
+.mat-column-acciones {
+  width: 100px; /* Ancho fijo para 2 botones */
+  max-width: 100px;
+}
+
+/* 1. Hacemos que el contenedor del diálogo no tenga padding
+      para que el formulario ocupe todo el espacio. */
+.gasto-form-dialog .mat-dialog-container {
+  padding: 0 !important;
+  overflow: hidden; /* Evita doble scrollbar */
+}
+
+/* 2. Sobrescribimos los estilos problemáticos de .page-container */
+.gasto-form-dialog .page-container {
+  min-height: 0; /* <-- Esta es la corrección principal del bug de altura */
+  background-color: #fff;
+  padding: 0;
+}
+
+/* 3. Ajustamos el título para el modal */
+.gasto-form-dialog .page-container h1 {
+  padding: 24px 24px 0 24px;
+  margin: 0;
+  font-size: 24px;
+  text-align: left; /* Opcional: alinear a la izquierda */
+}
+
+/* 4. Ajustamos el contenedor del formulario */
+.gasto-form-dialog .form-container {
+  box-shadow: none; /* El modal ya tiene sombra */
+  border-radius: 0;
+  max-width: none; /* Dejamos que el 'width' del diálogo controle el tamaño */
+  padding: 24px; /* Le damos el padding aquí */
+}
+
+/* 5. Aseguramos que el contenido del formulario tenga scroll */
+.gasto-form-dialog mat-dialog-content {
+  overflow-y: auto;
+  max-height: 100%;
+}

@@ -1,5 +1,5 @@
 <div class="page-container">
-  <h1>Registro de Nuevo Gasto</h1>
+  <h1>{{ isEditMode ? 'Editar Gasto' : 'Registro de Nuevo Gasto' }}</h1>
 
   <form [formGroup]="gastoForm" (ngSubmit)="onSubmit()" class="form-container">
     <div class="section-grid">
@@ -179,8 +179,8 @@
         type="submit"
         [disabled]="gastoForm.invalid"
       >
-        <mat-icon>save</mat-icon>
-        Registrar Gasto
+        <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+        {{ isEditMode ? 'Actualizar Gasto' : 'Registrar Gasto' }}
       </button>
     </div>
     </form>

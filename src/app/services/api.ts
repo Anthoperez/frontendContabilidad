@@ -121,6 +121,13 @@ export class ApiService {
   }
 
   /**
+   * NUEVO: Obtiene la lista maestra de TODOS los PICs (de mapaModalidadesPIC).
+   */
+  getMasterPicProjectList(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/projects/pic-master-list`);
+  }
+  
+  /**
    * NUEVO: Obtiene solo proyectos PIC
    */
   getPicProjects(): Observable<string[]> {
@@ -204,6 +211,26 @@ export class ApiService {
   }
 // ▲▲▲ FIN DE LAS NUEVAS FUNCIONES ▲▲▲
 
+/**
+   * Actualiza un gasto existente.
+   */
+  updateGasto(id: number, gasto: Gasto): Observable<Gasto> {
+    return this.http.put<Gasto>(`${this.apiUrl}/gastos/${id}`, gasto);
+  }
+
+  /**
+   * Elimina un gasto por su ID.
+   */
+  deleteGasto(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/gastos/${id}`);
+  }
+
+  /**
+   * Elimina TODOS los gastos.
+   */
+  deleteAllGastos(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/gastos/all`);
+  }
 
   
 }
