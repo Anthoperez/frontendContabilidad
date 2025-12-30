@@ -46,6 +46,8 @@ export interface IngresoPic {
 export interface PicMetadataDto {
   projectName: string;
   investigador?: string;
+  tesista?: string;
+  asesor?: string;
   duracion?: string;
   presupuestoTotal?: number | null;
   ingresos?: IngresoPic[];
@@ -56,6 +58,8 @@ export interface PicMetadataDto {
 // ▼▼▼ AÑADIR ESTA INTERFAZ ▼▼▼
 // Define la estructura de los metadatos opcionales
 export interface ReportMetadata {
+  tituloProyecto?: string;
+  codigoProyecto?: string;
   investigador?: string;
   rr_investigador?: string;
   fechaInicio?: string;

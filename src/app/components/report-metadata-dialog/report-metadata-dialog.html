@@ -5,6 +5,21 @@
 
     <form [formGroup]="metadataForm" class="metadata-form">
 
+      <div *ngIf="reportType === 'contrato'">
+        <h3>Datos Específicos del Contrato</h3>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Título / Descripción del Proyecto</mat-label>
+          <textarea matInput formControlName="tituloProyecto" rows="3" placeholder='Ej: "INCUBAUNT 2.0 FOMENTANDO STARTUPS..."'></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Código del Proyecto (Ej: INC20-1-P-006-23)</mat-label>
+          <input matInput formControlName="codigoProyecto">
+        </mat-form-field>
+        <hr>
+      </div>
+      
       <h3>Investigador y Proyecto</h3>
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Nombre del Investigador</mat-label>

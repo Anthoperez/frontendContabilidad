@@ -51,6 +51,8 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     // ▲▲▲ FIN DE LA LÓGICA ▲▲▲
 
     this.metadataForm = this.fb.group({
+      tituloProyecto: [''], 
+      codigoProyecto: [''],
       investigador: [''],
       rr_investigador: [''], // Para la "R.R. Nº..."
       fechaInicio: [''],

@@ -73,6 +73,8 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
     // Inicializa el formulario (vacío al principio)
     this.metadataForm = this.fb.group({
       investigador: [''],
+      tesista: [''],
+      asesor: [''],  
       duracion: [''],
       presupuestoTotal: [null as number | null],
       ingresos: this.fb.array([]),
@@ -160,6 +162,8 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
           // Si hay datos, rellenar el formulario
           this.metadataForm.patchValue({
             investigador: data.investigador,
+            tesista: data.tesista,
+            asesor: data.asesor,
             duracion: data.duracion,
             presupuestoTotal: data.presupuestoTotal,
           });
@@ -208,6 +212,8 @@ export class PicMetadataFormComponent implements OnInit, OnDestroy {
     const dataToSend: PicMetadataDto = {
       projectName: projectName,
       investigador: formData.investigador || '',
+      tesista: formData.tesista || '',
+      asesor: formData.asesor || '',
       duracion: formData.duracion || '',
       presupuestoTotal: parseFloat(String(formData.presupuestoTotal).replace(/,/g, '')) || null,
       ingresos: formData.ingresos
