@@ -110,33 +110,46 @@ export class ExcelImporterComponent {
     }
 
     if (typeof value === 'string') {
-      const parts = value.split('/');
+      const cleanValue = value.trim();
+      
+      // Soportar separadores / o -
+      let separator = '/';
+      if (cleanValue.includes('-')) separator = '-';
+      
+      const parts = cleanValue.split(separator);
       if (parts.length !== 3) return null;
 
-      let day: number, month: number, year: number;
+      let partA = parseInt(parts[0], 10); // Puede ser Día o Mes
+      let partB = parseInt(parts[1], 10); // Puede ser Mes o Día
+      let year = parseInt(parts[2], 10);
 
-      if (fieldName === 'fechaDevengado') {
-        day = parseInt(parts[0], 10);
-        month = parseInt(parts[1], 10);
-        year = parseInt(parts[2], 10);
-      } else {
-        month = parseInt(parts[0], 10);
-        day = parseInt(parts[1], 10);
-        year = parseInt(parts[2], 10);
-      }
       if (year < 100) year += 2000;
 
+      let day: number, month: number;
+
+      // --- LÓGICA DE DETECCIÓN INTELIGENTE ---
+      // Si el segundo número es mayor a 12, ¡definitivamente es el DÍA! (Formato MM/DD/YYYY)
+      // Ejemplo: 4/19/2025 -> 19 no puede ser mes. Entonces 19 es día, 4 es mes.
+      if (partB > 12) {
+        month = partA;
+        day = partB;
+      } else {
+        // En caso contrario, asumimos el estándar Perú (DD/MM/YYYY)
+        // Ejemplo: 25/02/2025 -> 25 es día, 02 es mes.
+        day = partA;
+        month = partB;
+      }
+
+      // Validaciones finales de seguridad
       if (
-        isNaN(day) ||
-        isNaN(month) ||
-        isNaN(year) ||
-        month < 1 ||
-        month > 12 ||
-        day < 1 ||
-        day > 31
+        isNaN(day) || isNaN(month) || isNaN(year) ||
+        month < 1 || month > 12 ||
+        day < 1 || day > 31
       ) {
         return null;
-      } // ✅ CORRECCIÓN: Se añade la hora 12 para evitar el desfase de zona horaria.
+      }
+
+      // Crear fecha UTC a las 12:00 del mediodía para evitar problemas de zona horaria
       const date = new Date(Date.UTC(year, month - 1, day, 12));
       return !isNaN(date.getTime()) ? date : null;
     }

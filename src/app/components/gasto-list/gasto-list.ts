@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService, Gasto } from '../../services/api';
 
+
 // --- NUEVAS IMPORTACIONES ---
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -14,6 +15,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { GastoFormComponent } from '../gasto-form/gasto-form';
 // --- FIN DE NUEVAS IMPORTACIONES ---
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Importaciones de Angular Material
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -24,7 +26,7 @@ import { MatCardModule } from '@angular/material/card';
   selector: 'app-gasto-list',
   standalone: true,
   imports: [CommonModule, MatTableModule, MatCardModule, MatButtonModule, MatPaginatorModule, MatFormFieldModule,
-    MatIconModule, MatInputModule, MatSortModule, MatDialogModule, MatSnackBarModule
+    MatIconModule, MatInputModule, MatSortModule, MatDialogModule, MatSnackBarModule, MatTooltipModule
   ],
   templateUrl: './gasto-list.html',
   styleUrls: ['./gasto-list.css']

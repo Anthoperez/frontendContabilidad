@@ -1,107 +1,106 @@
+/* --- 1. CONFIGURACIÓN DE LA TABLA --- */
 .table-container {
-  overflow-x: auto; /* Permite el scroll horizontal */
-  max-width: 100%;
-  margin-top: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background-color: #fff;
-  padding: 10px;
+    overflow-x: auto;
+    max-height: calc(100vh - 180px);
+    background: white;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 1200px; /* Asegura un ancho mínimo para la tabla */
-
+    width: 100%;
+    border-collapse: collapse; /* Vuelve a collapse para alinear mejor */
+    min-width: 1200px;
 }
 
-.monto-cell {
-  text-align: right;
-  font-weight: bold;
-  min-width: 120px; /* Evita que la columna de monto se encoja mucho */
-  color: #2E7D32; /* Color verde para los montos */
-  background-color: #E8F5E9; /* Fondo verde claro para la columna de monto */
-  border-radius: 4px;
-  padding: 5px 10px;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
-
-
-}
-
+/* --- 2. ESTILOS DE CELDAS (TD / TH) --- */
 th.mat-header-cell, td.mat-cell {
-  padding: 0 8px;
-  white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-  text-overflow: ellipsis; /* Añade "..." si el texto es demasiado largo */
-  overflow: hidden; /* Oculta el desbordamiento */
-  max-width: 150px; /* Limita el ancho máximo de las celdas */
-  border-bottom: 1px solid #e0e0e0;
-
+    padding: 0 16px; /* Un poco más de aire horizontal */
+    border-bottom: 1px solid #f0f0f0;
+    height: 65px; /* Altura fija para que la fila se vea "gordita" y elegante */
+    vertical-align: middle; /* Centrado vertical vital */
+    font-size: 13px;
+    color: #455a64;
 }
 
-/* ▼▼▼ MODIFICACIÓN AQUÍ (AÑADIR ESTA CLASE) ▼▼▼ */
-.monto-negativo {
-  color: #D32F2F !important; /* Rojo oscuro */
-  background-color: #FFEBEE !important; /* Fondo rojo claro */
+/* Header */
+th.mat-header-cell {
+    background-color: #fafafa; /* Fondo muy claro para el header */
+    color: #263238;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e0e0e0;
+    white-space: nowrap; /* Títulos siempre en una línea */
 }
 
-mat-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap; /* Para pantallas pequeñas */
+/* --- 3. CLASES PARA CORTAR TEXTO (EL TRUCO) --- */
+/* Esto se aplica al DIV dentro de la celda, no a la celda misma */
+.texto-cortado {
+    white-space: nowrap;      /* Una sola línea */
+    overflow: hidden;         /* Ocultar sobrante */
+    text-overflow: ellipsis;  /* Puntos suspensivos (...) */
+    display: block;           /* Comportamiento de bloque DENTRO de la celda */
 }
 
-/* Campo de filtro */
-.filter-field {
-  width: 100%;
-  max-width: 400px;
-  margin-right: 16px;
+/* Tamaños específicos */
+.ancho-medio {
+    max-width: 180px; /* Ajusta según tu gusto */
+}
+.ancho-largo {
+    max-width: 280px; /* Para conceptos largos */
 }
 
-/* Botón de eliminar todo */
-.delete-all-button {
-  margin-left: auto; /* Empuja el botón a la derecha */
+/* --- 4. ESTILO BOTÓN VERDE (MONTO) --- */
+.monto-badge {
+    background-color: #E0F2F1;
+    color: #00695C;
+    font-weight: 700;
+    font-family: 'Roboto', sans-serif; /* O la fuente que uses */
+    padding: 8px 10px;
+    border-radius: 50px;
+    display: inline-block;
+    min-width: 100px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+.monto-badge.negativo {
+    background-color: #FFEBEE;
+    color: #C62828;
 }
 
-/* Columna de acciones */
+/* --- 5. COLUMNAS PEQUEÑAS (Centrado) --- */
+.mat-column-tipoDocumento, 
+.mat-column-numeroDocumento, 
+.mat-column-siaf, 
+.mat-column-ff, 
+.mat-column-mes {
+    text-align: center;
+}
+
+.mat-column-siaf {
+    font-weight: bold;
+    color: #1976D2;
+}
+
+/* --- 6. COLUMNA ACCIONES STICKY --- */
 .mat-column-acciones {
-  width: 100px; /* Ancho fijo para 2 botones */
-  max-width: 100px;
+    position: sticky !important;
+    right: 0;
+    background: #fff; /* Tapar el scroll */
+    border-left: 1px solid #f0f0f0;
+    width: 100px;
+    padding: 0 8px !important;
+    z-index: 100;
+}
+th.mat-column-acciones {
+    background-color: #fafafa !important; /* Mismo color del header */
+    z-index: 101;
 }
 
-/* 1. Hacemos que el contenedor del diálogo no tenga padding
-      para que el formulario ocupe todo el espacio. */
-.gasto-form-dialog .mat-dialog-container {
-  padding: 0 !important;
-  overflow: hidden; /* Evita doble scrollbar */
-}
+/* Fix Hover */
+tr.mat-row:hover { background-color: #f5f5f5; }
+tr.mat-row:hover .mat-column-acciones { background-color: #f5f5f5; }
 
-/* 2. Sobrescribimos los estilos problemáticos de .page-container */
-.gasto-form-dialog .page-container {
-  min-height: 0; /* <-- Esta es la corrección principal del bug de altura */
-  background-color: #fff;
-  padding: 0;
-}
-
-/* 3. Ajustamos el título para el modal */
-.gasto-form-dialog .page-container h1 {
-  padding: 24px 24px 0 24px;
-  margin: 0;
-  font-size: 24px;
-  text-align: left; /* Opcional: alinear a la izquierda */
-}
-
-/* 4. Ajustamos el contenedor del formulario */
-.gasto-form-dialog .form-container {
-  box-shadow: none; /* El modal ya tiene sombra */
-  border-radius: 0;
-  max-width: none; /* Dejamos que el 'width' del diálogo controle el tamaño */
-  padding: 24px; /* Le damos el padding aquí */
-}
-
-/* 5. Aseguramos que el contenido del formulario tenga scroll */
-.gasto-form-dialog mat-dialog-content {
-  overflow-y: auto;
-  max-height: 100%;
+/* Estilos tarjeta general */
+mat-card {
+    border: none;
+    box-shadow: none !important;
 }
