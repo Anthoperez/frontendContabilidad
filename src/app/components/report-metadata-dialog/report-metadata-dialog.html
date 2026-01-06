@@ -8,6 +8,13 @@
       <div *ngIf="reportType === 'contrato'">
         <h3>Datos Específicos del Contrato</h3>
         
+        <div class="date-duration-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Año de Ejecución del Reporte</mat-label>
+            <input matInput type="number" formControlName="anio" placeholder="Ej: 2025">
+          </mat-form-field>
+        </div>
+        
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Título / Descripción del Proyecto</mat-label>
           <textarea matInput formControlName="tituloProyecto" rows="3" placeholder='Ej: "INCUBAUNT 2.0 FOMENTANDO STARTUPS..."'></textarea>
@@ -18,38 +25,38 @@
           <input matInput formControlName="codigoProyecto">
         </mat-form-field>
         <hr>
-      </div>
+        </div>
       
       <h3>Investigador y Proyecto</h3>
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Nombre del Investigador</mat-label>
         <input matInput formControlName="investigador">
       </mat-form-field>
-
+      
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Resolución (Ej: R.R. Nº 1825-2024/UNT)</mat-label>
         <input matInput formControlName="rr_investigador">
       </mat-form-field>
-
+      
       <div class="date-duration-grid">
         <mat-form-field appearance="outline">
           <mat-label>Fecha de Inicio</mat-label>
           <input matInput formControlName="fechaInicio">
         </mat-form-field>
-
+      
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Fecha de Culminación</mat-label>
           <input matInput [matDatepicker]="pickerCulminacion" formControlName="fechaCulminacion" />
           <mat-datepicker-toggle matSuffix [for]="pickerCulminacion"></mat-datepicker-toggle>
           <mat-datepicker #pickerCulminacion></mat-datepicker>
         </mat-form-field>
-
+      
         <mat-form-field appearance="outline">
           <mat-label>Duración (Ej: 18 meses)</mat-label>
           <input matInput formControlName="duracion">
         </mat-form-field>
       </div>
-
+      
       <hr>
 
       <div *ngIf="reportType === 'contrato'">

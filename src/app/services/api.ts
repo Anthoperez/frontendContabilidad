@@ -65,6 +65,7 @@ export interface ReportMetadata {
   fechaInicio?: string;
   duracion?: string;
   fechaCulminacion?: Date;
+  anio?: number;
   ingresos?: {
   descripcion: string;
   monto: number;

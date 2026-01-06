@@ -51,6 +51,7 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     // ▲▲▲ FIN DE LA LÓGICA ▲▲▲
 
     this.metadataForm = this.fb.group({
+      anio: [2025, [Validators.required]],
       tituloProyecto: [''], 
       codigoProyecto: [''],
       investigador: [''],
@@ -219,6 +220,7 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
     // Antes de cerrar, asegurarnos de que los montos sean números (si no son null)
     const formValue = this.metadataForm.value;
 
+    formValue.anio = Number(formValue.anio) || 2025;
     // Convertir strings vacíos a null para campos numéricos
     for (const key in formValue) {
       if (typeof formValue[key] === 'string' && formValue[key] === '') {
@@ -242,7 +244,7 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
       formValue.gastosAnosAnteriores = formValue.gastosAnosAnteriores
         .map((gasto: any) => {
           // Limpiamos los valores de la fila
-          const filaLimpia: any = { year: Number(gasto.year) || (new Date().getFullYear() - 1) };
+          const filaLimpia: any = { year: Number(gasto.year) || new Date().getFullYear() - 1 };
           for (const key in gasto) {
             if (key !== 'year') {
               if (gasto[key] === '' || gasto[key] === null || gasto[key] === undefined) {
@@ -255,31 +257,33 @@ export class ReportMetadataDialogComponent implements OnInit { // Implementar On
           return filaLimpia;
         })
         // Filtramos filas que podrían estar vacías (aunque siempre tendrán un año)
-        .filter((gasto: any) => gasto.year); 
+        .filter((gasto: any) => gasto.year);
     }
     // ▲▲▲ FIN DE LA MODIFICACIÓN ▲▲▲
 
     // ▼▼▼ --- NUEVA LÓGICA PARA PROCESAR PRESUPUESTO DINÁMICO --- ▼▼▼
     if (this.reportType === 'contrato') {
-    if (formValue.presupuestoEntidades) {
-      formValue.presupuestoEntidades = formValue.presupuestoEntidades
-          .filter((ent: any) => ent.nombreEntidad || ent.aporteNoMonetario !== null || ent.aporteMonetario !== null)
-          .map((ent: any) => ({
-            nombreEntidad: ent.nombreEntidad,
-            aporteNoMonetario: ent.aporteNoMonetario !== null ? Number(ent.aporteNoMonetario) : null,
-            aporteMonetario: ent.aporteMonetario !== null ? Number(ent.aporteMonetario) : null,
-        }));
-    }
-    // Borrar el campo de PIC
-      delete formValue.presupuestoTotalPic;
-    // ▲▲▲ --- FIN DE LA NUEVA LÓGICA --- ▲▲▲
-
+      if (formValue.presupuestoEntidades) {
+        formValue.presupuestoEntidades = formValue.presupuestoEntidades
+          .filter(
+            (ent: any) =>
+              ent.nombreEntidad || ent.aporteNoMonetario !== null || ent.aporteMonetario !== null
+          )
+          .map((ent: any) => ({
+            nombreEntidad: ent.nombreEntidad,
+            aporteNoMonetario:
+              ent.aporteNoMonetario !== null ? Number(ent.aporteNoMonetario) : null,
+            aporteMonetario: ent.aporteMonetario !== null ? Number(ent.aporteMonetario) : null,
+          }));
+      }
+      // Borrar el campo de PIC
+      delete formValue.presupuestoTotalPic;
+      // ▲▲▲ --- FIN DE LA NUEVA LÓGICA --- ▲▲▲
     } else {
-      // Procesar presupuesto FIJO (PIC)
-      formValue.presupuestoTotalPic = formValue.presupuestoTotalPic !== null ? Number(formValue.presupuestoTotalPic) : null;
-      // Borrar el campo de Contrato
-      delete formValue.presupuestoEntidades;
-    }
+      // Procesar presupuesto FIJO (PIC)
+      formValue.presupuestoTotalPic = formValue.presupuestoTotalPic !== null ? Number(formValue.presupuestoTotalPic) : null; // Borrar el campo de Contrato
+      delete formValue.presupuestoEntidades;
+    }
 
     this.dialogRef.close(formValue);
   }
