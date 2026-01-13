@@ -98,7 +98,7 @@ export class GastoFormComponent implements OnInit, OnDestroy {
     {
       seccion: 'V CONVOCATORIA - 2021 MODALIDAD 2: PROYECTOS DE INVESTIGACIÓN DE TESIS DE PREGRADO',
       proyectos: [
-        'PIC 01-2021 MOD. 02 - V CONV.A',
+        'PIC 01-2021 MOD. 02 - V CONV.',
         'PIC 02-2021 MOD. 02 - V CONV.',
         'PIC 03-2021 MOD. 02 - V CONV.',
         'PIC 04-2021 MOD. 02 - V CONV.',

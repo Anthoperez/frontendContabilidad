@@ -182,23 +182,21 @@ export class ExcelImporterComponent {
 
     for (const row of rawData) {
       if (!row || row.length === 0) continue;
-      const firstCell = row[0] ? String(row[0]).trim() : '';
+      const firstCell = row[0] ? String(row[0]).trim().toUpperCase() : '';
       if (firstCell === 'DOC') {
         currentHeaders = row.map((h) => (h ? String(h).trim().replace(/\s+/g, ' ') : ''));
         continue;
       }
-      if (
-        row.some((cell) => cell && typeof cell === 'string' && cell.toUpperCase().includes('TOTAL'))
-      ) {
-        currentHeaders = null;
+      const tienePalabraTotal = row.some((cell) => cell && typeof cell === 'string' && cell.toUpperCase().includes('TOTAL'));
+      if (tienePalabraTotal && firstCell === '') {
         continue;
       }
-      if (!currentHeaders || !firstCell) continue;
+      if (!currentHeaders) continue;
       const gasto: Partial<Gasto> = {};
       let especificaCount = 0;
       currentHeaders.forEach((header, index) => {
-        let dbField = columnMap[header];
-        if (header === 'ESPECIFICA') {
+        let dbField = columnMap[header.toUpperCase()];
+        if (header.toUpperCase() === 'ESPECIFICA') {
           dbField = especificaCount === 0 ? 'especifica' : 'especifica2';
           especificaCount++;
         }
@@ -214,7 +212,8 @@ export class ExcelImporterComponent {
             const parsedDate = this.parseExcelDate(originalValue, dbField);
             finalValue = parsedDate ? parsedDate.toISOString() : null;
           } else if (dbField === 'monto' || dbField === 'monto2') {
-            const numValue = parseFloat(String(finalValue).replace(/,/g, ''));
+            const cleanString = String(finalValue).replace(/[^0-9.-]/g, '');
+            const numValue = parseFloat(cleanString);
             finalValue = isNaN(numValue) ? null : numValue;
           }
           if (finalValue !== null && String(finalValue).trim() !== '') {
@@ -225,7 +224,9 @@ export class ExcelImporterComponent {
         }
       });
 
-      if (gasto.tipoDocumento && gasto.monto && gasto.fechaDevengado) {
+      const tieneMonto = (gasto.monto !== null && gasto.monto !== undefined) || (gasto.monto2 !== null && gasto.monto2 !== undefined);
+
+      if (gasto.tipoDocumento && gasto.fechaDevengado && tieneMonto) {
         gastos.push(gasto);
       }
     }

@@ -177,7 +177,6 @@ export class ApiService {
     });
   }
 
-
   // ▼▼▼ AÑADIR ESTE NUEVO MÉTODO ▼▼▼
   /**
    * Genera un reporte global con todos los gastos agrupados por Meta.
@@ -238,4 +237,40 @@ export class ApiService {
   }
 
   
+    /**
+ * Descarga reporte de un proyecto para un mes específico
+ */
+downloadProjectMonthReport(
+  projectName: string,
+  month: string,
+  year?: number,
+): Observable<Blob> {
+  const body = {
+    projectName: projectName,
+    month: month,
+    year: year || 2025,
+  };
+
+  return this.http.post(`${this.apiUrl}/reports/project-month`, body, {
+    responseType: 'blob',
+  });
+}
+
+/**
+ * Descarga reporte anual de un proyecto (12 hojas mensuales)
+ */
+downloadProjectAnnualReport(
+  projectName: string,
+  year?: number,
+): Observable<Blob> {
+  const body = {
+    projectName: projectName,
+    year: year || 2025,
+  };
+
+  return this.http.post(`${this.apiUrl}/reports/project-annual`, body, {
+    responseType: 'blob',
+  });
+}
+
 }
