@@ -33,17 +33,38 @@
             <form [formGroup]="metadataForm" *ngIf="!isPageLoading && selectedProject.value">
 
                 <h3>Datos Generales del Proyecto</h3>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Título del Proyecto (Opcional - Sobreescribe el default)</mat-label>
+                    <textarea matInput formControlName="tituloProyecto" rows="2"></textarea>
+                </mat-form-field>
+
                 <div class="form-grid">
                     <mat-form-field appearance="outline">
-                        <mat-label>Investigador</mat-label>
+                        <mat-label>Código Adicional (Ej: INC20...)</mat-label>
+                        <input matInput formControlName="codigoProyecto">
+                    </mat-form-field>
+                    
+                    <mat-form-field appearance="outline">
+                        <mat-label>Resolución (Ej: R.R. N°...)</mat-label>
+                        <input matInput formControlName="resolucion">
+                    </mat-form-field>
+                </div>
+
+                <hr>
+
+                <div class="form-grid">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Investigador Responsable</mat-label>
                         <input matInput formControlName="investigador">
                     </mat-form-field>
 
                     <mat-form-field appearance="outline">
-                        <mat-label>Duración (Ej: 24 Meses)</mat-label>
-                        <input matInput formControlName="duracion">
+                        <mat-label>Facultad / Escuela</mat-label>
+                        <input matInput formControlName="facultad" placeholder="Ej: Farmacia y Bioquímica">
                     </mat-form-field>
                 </div>
+
                 <div class="form-grid">
                     <mat-form-field appearance="outline">
                         <mat-label>Tesista (Opcional - Modalidad 2)</mat-label>
@@ -55,6 +76,13 @@
                         <mat-label>Asesor (Opcional - Modalidad 2)</mat-label>
                         <input matInput formControlName="asesor" placeholder="Nombre del asesor">
                         <mat-hint>Llenar solo si aplica</mat-hint>
+                    </mat-form-field>
+                </div>
+
+                <div class="form-grid">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Duración (Ej: 24 Meses)</mat-label>
+                        <input matInput formControlName="duracion">
                     </mat-form-field>
                 </div>
 
